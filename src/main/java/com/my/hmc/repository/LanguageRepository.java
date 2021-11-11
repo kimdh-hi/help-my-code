@@ -6,10 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface LanguageRepository extends JpaRepository<Language, Long> {
 
-    Optional<User> findByUsername(String username);
-
+    @Query("select l.name from Language l where l.user.id = :userId")
+    List<String> findByUserId(Long userId);
 }

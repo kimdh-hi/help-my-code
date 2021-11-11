@@ -7,7 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -32,10 +34,12 @@ public class User extends Timestamped {
     private Integer reviewCount;
 
     @OneToMany(mappedBy = "user")
-    private Set<Language> languages = new HashSet<>();
+    private List<Language> languages = new ArrayList<>();
 
-    public void addLanguage(Language language) {
-        this.getLanguages().add(language);
-        language.setUser(this);
+    public User(String username, String password, UserRole role, Integer reviewCount) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.reviewCount = reviewCount;
     }
 }

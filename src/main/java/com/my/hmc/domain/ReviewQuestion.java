@@ -1,12 +1,15 @@
 package com.my.hmc.domain;
 
 import com.my.hmc.domain.etype.QuestionStatus;
+import com.my.hmc.request.ReviewUpdateRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,6 +25,10 @@ public class ReviewQuestion {
     @Column(nullable = false)
     private String code;
 
+    private String comment;
+
+    private String language;
+
     @Enumerated(EnumType.STRING)
     private QuestionStatus status;
 
@@ -32,4 +39,11 @@ public class ReviewQuestion {
     @JoinColumn(name = "a_user_id")
     @OneToOne(fetch = FetchType.LAZY)
     private User answerUser;
+
+    public void updateReviewQuestion(ReviewUpdateRequestDto dto) {
+        this.title = dto.getTitle() != null ? dto.getTitle() : this.getTitle();
+        this.code = dto.getCode() != null ? dto.getCode() : this.getCode();
+        this.comment = dto.getComment() != null ? dto.getComment() : this.getComment();
+        this.language = dto.getLanguage() != null ? dto.getLanguage() : this.getLanguage();
+    }
 }

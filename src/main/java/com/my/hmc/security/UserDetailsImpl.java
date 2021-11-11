@@ -4,8 +4,10 @@ import com.my.hmc.domain.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 @Getter
@@ -17,7 +19,11 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(this.user.getRole().toString());
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(authority);
+
+       return authorities;
     }
 
     @Override
