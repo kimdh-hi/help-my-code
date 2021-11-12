@@ -8,6 +8,7 @@ import com.my.hmc.repository.LanguageRepository;
 import com.my.hmc.repository.ReviewQuestionRepository;
 import com.my.hmc.repository.UserRepository;
 import com.my.hmc.request.SignupRequestDto;
+import com.my.hmc.response.ReviewResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -42,11 +43,13 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
-        Set<String> languages = requestDto.getLanguages();
-        for (String l : languages) {
-            Language language = new Language(l);
-            language.setUser(savedUser);
-            languageRepository.save(language);
+        if (requestDto.getLanguages().size() > 0) {
+            Set<String> languages = requestDto.getLanguages();
+            for (String l : languages) {
+                Language language = new Language(l);
+                language.setUser(savedUser);
+                languageRepository.save(language);
+            }
         }
 
 
@@ -57,9 +60,20 @@ public class UserService {
         return languageRepository.findByUserId(userId);
     }
 
-    public void getMyReviewRequests(User user) {
-        List<ReviewQuestion> reviews = reviewQuestionRepository.findByQuestionUser(user);
+    public List<ReviewResponseDto> getMyReviewRequests(User user) {
+        return reviewQuestionRepository.findByQuestionUser(user).stream()
+                .map(r -> new ReviewResponseDto(r.getId(), r.getTitle(), r.getCode(), r.getComment(), r.getLanguage()))
+                .collect(Collectors.toList());
+    }
 
+    public ReviewResponseDto getMyReviewRequest(User user, Long id) {
+        ReviewQuestion reviewQuestion = reviewQuestionRepository.findByIdAndQuestionUser(id, user).orElseThrow(
+                () -> new IllegalArgumentException("찾을 수 없는 코드리뷰 요청입니다.")
+        );
+
+        return new ReviewResponseDto(
+                reviewQuestion.getId(), reviewQuestion.getTitle(), reviewQuestion.getCode(), reviewQuestion.getComment(), reviewQuestion.getLanguage()
+        );
     }
 
 }

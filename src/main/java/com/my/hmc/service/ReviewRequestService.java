@@ -1,7 +1,10 @@
 package com.my.hmc.service;
 
+import com.my.hmc.domain.Language;
 import com.my.hmc.domain.ReviewQuestion;
 import com.my.hmc.domain.User;
+import com.my.hmc.domain.etype.QuestionStatus;
+import com.my.hmc.repository.LanguageRepository;
 import com.my.hmc.repository.ReviewAnswerRepository;
 import com.my.hmc.repository.ReviewQuestionRepository;
 import com.my.hmc.repository.UserRepository;
@@ -10,6 +13,7 @@ import com.my.hmc.request.ReviewUpdateRequestDto;
 import com.my.hmc.response.PageResponseDto;
 import com.my.hmc.response.ReviewListResponseDto;
 import com.my.hmc.response.ReviewResponseDto;
+import com.my.hmc.response.ReviewerInfoDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,11 +28,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class ReviewService {
+public class ReviewRequestService {
 
     private final UserRepository userRepository;
     private final ReviewQuestionRepository reviewQuestionRepository;
     private final ReviewAnswerRepository reviewAnswerRepository;
+    private final LanguageRepository languageRepository;
 
     @Transactional
     public ReviewQuestion addReview(ReviewAddRequestDto requestDto, User user) {
@@ -45,6 +50,7 @@ public class ReviewService {
                 .questionUser(user)
                 .language(requestDto.getLanguage())
                 .answerUser(reviewer)
+                .status(QuestionStatus.REQUESTED)
                 .build();
 
         return reviewQuestionRepository.save(reviewQuestion);
@@ -93,6 +99,19 @@ public class ReviewService {
         if (reviewQuestionRepository.existsByUserAndId(user.getId(), reviewId)) {
             reviewQuestionRepository.deleteById(reviewId);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewerInfoDto> findReviewerByLanguage(String language) {
+        List<Language> languages = languageRepository.findAllByName(language);
+        return languages.stream().map(
+                l -> ReviewerInfoDto.builder()
+                            .userId(l.getUser().getId())
+                            .username(l.getUser().getUsername())
+                            .languageId(l.getId())
+                            .language(l.getName())
+                            .build()
+        ).collect(Collectors.toList());
     }
 }
 

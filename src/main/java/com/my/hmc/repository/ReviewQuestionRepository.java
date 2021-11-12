@@ -16,6 +16,12 @@ public interface ReviewQuestionRepository extends JpaRepository<ReviewQuestion, 
 
     List<ReviewQuestion> findByQuestionUser(User user);
 
+    Optional<ReviewQuestion> findByIdAndQuestionUser(Long id, User questionUser);
+
+    Page<ReviewQuestion> findByAnswerUser(User answerUser, Pageable pageable);
+
+    ReviewQuestion findByIdAndAnswerUser(Long id, User answerUser);
+
     void deleteById(Long id);
 
     @Query("select count (rq.id) > 0 " +

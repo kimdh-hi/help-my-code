@@ -6,4 +6,11 @@ body {
 .index-btn {
     height: 200px;
     width: 200px;
+    margin-top: 30px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.user-btn-box {
+    margin-top: 30px;
 }

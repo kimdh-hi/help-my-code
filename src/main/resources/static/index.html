@@ -19,14 +19,170 @@
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-
+    <script src="./js/index.js"></script>
 </head>
 <body>
 
 <div class="container">
-    <div class="index-btn-box">
-        <button type="button" class="btn btn-secondary index-btn">리뷰요청</button>
-        <button type="button" class="btn btn-success index-btn">리뷰하기</button>
+
+    <div class="user-btn-box">
+        <button type="button" class="btn btn-primary btn-lg" onclick="openSigninModal()" id="signinBtn">로그인</button>
+        <button type="button" class="btn btn-danger btn-lg" onclick="logout()" id="logoutBtn" style="display: none">로그아웃
+        </button>
+        <button type="button" class="btn btn-primary btn-lg" onclick="openSignupModal()" id="signupBtn">회원가입</button>
+    </div>
+    <div class="index-btn-box mb-5">
+        <button type="button" class="btn btn-secondary index-btn" id="reviewRequestBtn" style="display: none"
+                onclick="showCodeReviewRequestForm()">코드리뷰요청
+        </button>
+        <button type="button" class="btn btn-success index-btn" id="reviewAnswerBtn" style="display: none">리뷰하기</button>
+        <button type="button" class="btn btn-light index-btn" id="reviewRequestListBtn">코드리뷰목록</button>
+    </div>
+
+
+    <div id="codeReviewRequestForm" style="display: none">
+        <form class="form-floating mb-3">
+            <label for="codeReviewTitle">Title</label>
+            <input type="text" class="form-control" id="codeReviewTitle" placeholder="제목을 입력하세요.">
+        </form>
+
+        <div class="form-floating mb-3">
+            <label for="codeReviewCode">Code</label>
+            <textarea class="form-control" placeholder="코드를 입력하세요." id="codeReviewCode"
+                      style="height: 300px"></textarea>
+        </div>
+
+        <div class="form-floating mb-3">
+            <label for="codeReviewComment">Comments</label>
+            <textarea class="form-control" placeholder="설명을 입력하세요." id="codeReviewComment"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <select class="form-select" aria-label="Default select example" id="codeReviewRequestLanguageSelectBox">
+                <option selected>언어 선택</option>
+                <option value="Java">Java</option>
+                <option value="Python">Python</option>
+                <option value="Javascript">Javascript</option>
+                <option value="C++">C++</option>
+                <option value="HTML">HTML</option>
+                <option value="CSS">C++</option>
+            </select>
+        </div>
+
+        <div class="mb-3" id="reviewerSelectDiv" style="display: none">
+            <select class="form-select" aria-label="Default select example" id="codeReviewRequestReviewerSelectBox">
+
+            </select>
+        </div>
+
+        <button id="requestCodeReviewBtn" class="btn btn-primary btn-lg" onclick="requestCodeReview()" style="display: none">요청</button>
+    </div>
+
+</div>
+
+
+<!-- 회원가입 모달-->
+<div class="modal fade" id="signupModal" tabindex="-1" role="dialog" aria-labelledby="articleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">회원가입</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-content">
+                <div class="mb-3">
+                    <label for="signup-id" class="form-label">아이디</label>
+                    <input type="text" class="form-control" id="signup-id">
+                </div>
+                <div class="mb-3">
+                    <label for="signup-password" class="form-label">비밀번호</label>
+                    <input type="password" class="form-control" id="signup-password">
+                </div>
+                <div class="mb-3">
+                    <input class="form-check-input" type="checkbox" id="signup-isReviewer">
+                    <label class="form-check-label" for="signup-isReviewer">
+                        리뷰어로 회원가입
+                    </label>
+                </div>
+
+                <div id="language-check-box" style="display: none">
+                    <p>대표 언어를 선택하세요.</p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="Java" name="languageSelectBox">
+                        <label class="form-check-label">
+                            Java
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="Python" name="languageSelectBox">
+                        <label class="form-check-label">
+                            Python
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="Javascript" name="languageSelectBox">
+                        <label class="form-check-label">
+                            Javascript
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="C++" name="languageSelectBox">
+                        <label class="form-check-label">
+                            C++
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="HTML" name="languageSelectBox">
+                        <label class="form-check-label">
+                            HTML
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="CSS" name="languageSelectBox">
+                        <label class="form-check-label">
+                            CSS
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="signup()">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 로그인 모달-->
+<div class="modal fade" id="signinModal" tabindex="-1" role="dialog" aria-labelledby="articleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">로그인</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-content">
+                <div class="mb-3">
+                    <label for="signin-id" class="form-label">아이디</label>
+                    <input type="text" class="form-control" id="signin-id">
+                </div>
+                <div class="mb-3">
+                    <label for="signin-password" class="form-label">비밀번호</label>
+                    <input type="password" class="form-control" id="signin-password">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="signin()">로그인</button>
+            </div>
+        </div>
     </div>
 </div>
 

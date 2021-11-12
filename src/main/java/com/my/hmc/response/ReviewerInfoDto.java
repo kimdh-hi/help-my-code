@@ -1,4 +1,4 @@
-package com.my.hmc.request;
+package com.my.hmc.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class SigninRequestDto {
+public class ReviewerInfoDto {
 
+    private Long userId;
     private String username;
-    private String password;
+    private Long languageId;
+    private String language;
 }

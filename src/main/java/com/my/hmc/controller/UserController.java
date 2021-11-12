@@ -2,12 +2,15 @@ package com.my.hmc.controller;
 
 import com.my.hmc.request.SigninRequestDto;
 import com.my.hmc.request.SignupRequestDto;
+import com.my.hmc.response.ReviewResponseDto;
+import com.my.hmc.response.SigninResponseDto;
 import com.my.hmc.security.UserDetailsImpl;
 import com.my.hmc.security.UserDetailsServiceImpl;
 import com.my.hmc.security.jwt.JwtUtils;
 import com.my.hmc.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -38,7 +41,9 @@ public class UserController {
     }
 
     @PostMapping("/user/signin")
-    public String signin(@RequestBody SigninRequestDto requestDto) {
+    public SigninResponseDto signin(@RequestBody SigninRequestDto requestDto) {
+        log.info("로그은: {}", requestDto.getUsername());
+        log.info("비밀번호: {}", requestDto.getPassword());
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(requestDto.getUsername(), requestDto.getPassword())
@@ -50,7 +55,7 @@ public class UserController {
         UserDetails userDetails = userDetailsService.loadUserByUsername(requestDto.getUsername());
         String token = jwtUtils.createToken(userDetails.getUsername());
 
-        return token;
+        return new SigninResponseDto(token, HttpStatus.CREATED, "로그인에 성공했습니다.");
     }
 
     @Secured("ROLE_REVIEWER")
@@ -69,9 +74,25 @@ public class UserController {
         return data;
     }
 
-    @Secured("ROLE_USER")
-    @GetMapping("/user/review")
-    public void getMyReviewRequests(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    @Secured({"ROLE_USER", "ROLE_REVIEWER"})
+    @GetMapping("/user/reviews")
+    public List<ReviewResponseDto> getMyReviewRequests(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        List<ReviewResponseDto> reviewResponseDto = new ArrayList<>();
+        if (userDetails.getUser() != null) {
+            userService.getMyReviewRequests(userDetails.getUser());
+        }
 
+        return reviewResponseDto;
+    }
+
+    @Secured({"ROLE_USER", "ROLE_REVIEWER"})
+    @GetMapping("/user/review")
+    public ReviewResponseDto getMyReviewRequest(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestParam Long id) {
+        ReviewResponseDto responseDto = new ReviewResponseDto();
+        if (userDetails.getUser() != null) {
+            responseDto = userService.getMyReviewRequest(userDetails.getUser(), id);
+        }
+
+        return responseDto;
     }
 }

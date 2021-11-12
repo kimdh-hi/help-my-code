@@ -9,8 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class SigninRequestDto {
+public class AddReviewDto {
 
-    private String username;
-    private String password;
+    private Long reviewId;
+    private String title;
+    private String code;
+    private String comment;
+
 }

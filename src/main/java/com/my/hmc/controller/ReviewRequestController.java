@@ -4,14 +4,13 @@ import com.my.hmc.domain.ReviewQuestion;
 import com.my.hmc.request.ReviewAddRequestDto;
 import com.my.hmc.request.ReviewUpdateRequestDto;
 import com.my.hmc.response.BasicResponseDto;
-import com.my.hmc.response.PageResponseDto;
 import com.my.hmc.response.ReviewListResponseDto;
 import com.my.hmc.response.ReviewResponseDto;
+import com.my.hmc.response.ReviewerInfoDto;
 import com.my.hmc.security.UserDetailsImpl;
-import com.my.hmc.service.ReviewService;
+import com.my.hmc.service.ReviewRequestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -19,14 +18,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class ReviewController {
+public class ReviewRequestController {
 
-    private final ReviewService reviewService;
+    private final ReviewRequestService reviewRequestService;
 
     @Secured({"ROLE_USER", "ROLE_REVIEWER"})
     @PostMapping("/review")
@@ -34,7 +32,7 @@ public class ReviewController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody ReviewAddRequestDto requestDto
     ) {
-        ReviewQuestion reviewQuestion = reviewService.addReview(requestDto, userDetails.getUser());
+        ReviewQuestion reviewQuestion = reviewRequestService.addReview(requestDto, userDetails.getUser());
 
         return BasicResponseDto.builder()
                 .id(reviewQuestion.getId())
@@ -45,7 +43,7 @@ public class ReviewController {
 
     @GetMapping("/review")
     public ResponseEntity<ReviewResponseDto> getReview(@RequestParam Long reviewId) {
-        ReviewQuestion review = reviewService.getReview(reviewId);
+        ReviewQuestion review = reviewRequestService.getReview(reviewId);
         ReviewResponseDto responseDto = ReviewResponseDto.builder()
                 .id(review.getId())
                 .title(review.getTitle())
@@ -61,13 +59,13 @@ public class ReviewController {
             @RequestParam int page,
             @RequestParam int size
     ) {
-        return reviewService.getAllReviews(page, size);
+        return reviewRequestService.getAllReviews(page, size);
     }
 
     @PutMapping("/review")
     public BasicResponseDto editReview(@RequestParam Long reviewId, @RequestBody ReviewUpdateRequestDto requestDto) {
 
-        reviewService.reviewUpdate(reviewId, requestDto);
+        reviewRequestService.reviewUpdate(reviewId, requestDto);
 
         return new BasicResponseDto(null, "success", "수정 완료했습니다.", HttpStatus.OK);
     }
@@ -78,8 +76,14 @@ public class ReviewController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam Long reviewId
     ) {
-        reviewService.reviewDelete(reviewId, userDetails.getUser());
+        reviewRequestService.reviewDelete(reviewId, userDetails.getUser());
 
-        return null;
+        return new BasicResponseDto(null, "success", "삭제 완료했습니다.", HttpStatus.OK);
+    }
+
+    @Secured({"ROLE_USER", "ROLE_REVIEWER"})
+    @GetMapping("/review/language/user")
+    public List<ReviewerInfoDto> findReviewerByLanguage(@RequestParam String language) {
+        return reviewRequestService.findReviewerByLanguage(language);
     }
 }
