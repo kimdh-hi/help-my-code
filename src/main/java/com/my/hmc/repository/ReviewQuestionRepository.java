@@ -14,7 +14,7 @@ public interface ReviewQuestionRepository extends JpaRepository<ReviewQuestion, 
 
     Page<ReviewQuestion> findAll(Pageable pageable);
 
-    List<ReviewQuestion> findByQuestionUser(User user);
+    Page<ReviewQuestion> findByQuestionUser(User questionUser, Pageable pageable);
 
     Optional<ReviewQuestion> findByIdAndQuestionUser(Long id, User questionUser);
 

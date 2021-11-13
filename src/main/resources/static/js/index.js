@@ -47,6 +47,7 @@ function loginCheck() {
 
         $('#reviewRequestBtn').show()
         $('#reviewAnswerBtn').show()
+        $('#myReviewRequestListBtn').show()
     } else { // 인증이 되지 않은 경우
         $('#signinBtn').show()
         $('#signupBtn').show()
@@ -54,6 +55,7 @@ function loginCheck() {
 
         $('#reviewRequestBtn').hide()
         $('#reviewAnswerBtn').hide()
+        $('#myReviewRequestListBtn').hide()
     }
 }
 
@@ -172,6 +174,54 @@ function openDetailModal(id) {
             console.log(res);
         }
     })
+}
+
+function showMyReviewRequestList() {
+    let display = $('#codeReviewRequestListDiv').css("display")
+    if (display == "flex") {
+        $('#codeReviewRequestListDiv').css({"display": "none"})
+        return;
+    }
+    $('#codeReviewRequestListDiv').empty();
+    $('#codeReviewRequestListDiv').show();
+
+    $.ajax({
+        type: "GET",
+        url: `/user/reviews?page=1&size=10`,
+        success: function (res) {
+            console.log(res)
+            let reviews = res['reviews'];
+            for (let i=0; i<reviews.length; i++) {
+                let tmp_html = `<div class="card-header">${reviews[i].language}</div>
+                                <div class="card-body">
+                                    <h5 class="card-title">${reviews[i].title}</h5>
+                                    <p class="card-text">${reviews[i].comment}</p>
+                                    <a href="#" class="btn btn-primary">상세코드</a>
+                                </div>
+                                <div class="card-footer">
+                                    <button onclick="" type="button" class="btn btn-warning">수정</button>
+                                    <button onclick="deleteRequest('${reviews[i].id}')" type="button" class="btn btn-danger">삭제</button>
+                                </div>`
+                $('#codeReviewRequestListDiv').append(tmp_html);
+            }
+        }
+    })
+}
+
+function deleteRequest(id) {
+    $.ajax({
+        type: "DELETE",
+        url: `/review?id=${id}`,
+        success: function(res) {
+            console.log(res)
+            alert(res['message'])
+            showMyReviewRequestList()
+        }
+    })
+}
+
+function editRequest(id) {
+
 }
 
 

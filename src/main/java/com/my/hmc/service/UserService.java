@@ -8,9 +8,14 @@ import com.my.hmc.repository.LanguageRepository;
 import com.my.hmc.repository.ReviewQuestionRepository;
 import com.my.hmc.repository.UserRepository;
 import com.my.hmc.request.SignupRequestDto;
+import com.my.hmc.response.PageResponseDto;
+import com.my.hmc.response.ReviewListResponseDto;
 import com.my.hmc.response.ReviewResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,8 +37,8 @@ public class UserService {
 
     @Transactional
     public Long saveUser(SignupRequestDto requestDto) {
+//        UserRole userRole = requestDto.isReviewer() ? UserRole.ROLE_REVIEWER : UserRole.ROLE_USER;
         UserRole userRole = requestDto.isReviewer() ? UserRole.ROLE_REVIEWER : UserRole.ROLE_USER;
-//        UserRole userRole = requestDto.getReviewer() ? UserRole.ROLE_REVIEWER : UserRole.ROLE_USER;
 
         log.info("saveUser role = {}", userRole);
 //        log.info("savedUser isReviewer = {}", requestDto.getReviewer());
@@ -65,10 +70,26 @@ public class UserService {
         return languageRepository.findByUserId(userId);
     }
 
-    public List<ReviewResponseDto> getMyReviewRequests(User user) {
-        return reviewQuestionRepository.findByQuestionUser(user).stream()
-                .map(r -> new ReviewResponseDto(r.getId(), r.getTitle(), r.getCode(), r.getComment(), r.getLanguage()))
-                .collect(Collectors.toList());
+    public ReviewListResponseDto getMyReviewRequests(int page, int size, User user) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<ReviewQuestion> reviewQuestions = reviewQuestionRepository.findByQuestionUser(user, pageable);
+
+        List<ReviewResponseDto> reviewResponseDtoList = reviewQuestions.stream().map(
+                r -> new ReviewResponseDto(r.getId(), r.getTitle(), r.getCode(), r.getComment(), r.getLanguage())
+        ).collect(Collectors.toList());
+
+        PageResponseDto pageDto = PageResponseDto.builder()
+                .page(page)
+                .size(size)
+                .totalPages(reviewQuestions.getTotalPages())
+                .totalElements(reviewQuestions.getTotalElements())
+                .numberOfElements(reviewQuestions.getNumberOfElements()).build();
+
+        return ReviewListResponseDto.builder()
+                .reviews(reviewResponseDtoList)
+                .pageInfo(pageDto).build();
     }
 
     public ReviewResponseDto getMyReviewRequest(User user, Long id) {

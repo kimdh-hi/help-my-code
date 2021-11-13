@@ -3,6 +3,7 @@ package com.my.hmc.controller;
 import com.my.hmc.request.SigninRequestDto;
 import com.my.hmc.request.SignupRequestDto;
 import com.my.hmc.response.BasicResponseDto;
+import com.my.hmc.response.ReviewListResponseDto;
 import com.my.hmc.response.ReviewResponseDto;
 import com.my.hmc.response.SigninResponseDto;
 import com.my.hmc.security.UserDetailsImpl;
@@ -78,13 +79,12 @@ public class UserController {
 
     @Secured({"ROLE_USER", "ROLE_REVIEWER"})
     @GetMapping("/user/reviews")
-    public List<ReviewResponseDto> getMyReviewRequests(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        List<ReviewResponseDto> reviewResponseDto = new ArrayList<>();
-        if (userDetails.getUser() != null) {
-            userService.getMyReviewRequests(userDetails.getUser());
-        }
-
-        return reviewResponseDto;
+    public ReviewListResponseDto getMyReviewRequests(
+            @RequestParam int page, @RequestParam int size,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        --page;
+        return userService.getMyReviewRequests(page, size, userDetails.getUser());
     }
 
     @Secured({"ROLE_USER", "ROLE_REVIEWER"})

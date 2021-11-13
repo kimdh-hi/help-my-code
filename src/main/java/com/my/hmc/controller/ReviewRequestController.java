@@ -63,10 +63,11 @@ public class ReviewRequestController {
         return reviewRequestService.getAllReviews(page, size);
     }
 
+    @Secured({"ROLE_USER", "ROLE_REVIEWER"})
     @PutMapping("/review")
-    public BasicResponseDto editReview(@RequestParam Long reviewId, @RequestBody ReviewUpdateRequestDto requestDto) {
+    public BasicResponseDto editReview(@RequestParam Long id, @RequestBody ReviewUpdateRequestDto requestDto) {
 
-        reviewRequestService.reviewUpdate(reviewId, requestDto);
+        reviewRequestService.reviewUpdate(id, requestDto);
 
         return new BasicResponseDto(null, "success", "수정 완료했습니다.", HttpStatus.OK);
     }
@@ -75,9 +76,9 @@ public class ReviewRequestController {
     @DeleteMapping("/review")
     public BasicResponseDto deleteReview(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestParam Long reviewId
+            @RequestParam Long id
     ) {
-        reviewRequestService.reviewDelete(reviewId, userDetails.getUser());
+        reviewRequestService.reviewDelete(id, userDetails.getUser());
 
         return new BasicResponseDto(null, "success", "삭제 완료했습니다.", HttpStatus.OK);
     }

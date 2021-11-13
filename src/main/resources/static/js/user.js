@@ -43,7 +43,8 @@ function signup() {
     data = {
         "username": id,
         "password": password,
-        "reviewer": isReviewer,
+//        "isReviewer": isReviewer,
+        reviewer: isReviewer,
         "languages": langs
     }
 
