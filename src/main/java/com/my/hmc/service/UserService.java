@@ -33,6 +33,11 @@ public class UserService {
     @Transactional
     public Long saveUser(SignupRequestDto requestDto) {
         UserRole userRole = requestDto.isReviewer() ? UserRole.ROLE_REVIEWER : UserRole.ROLE_USER;
+//        UserRole userRole = requestDto.getReviewer() ? UserRole.ROLE_REVIEWER : UserRole.ROLE_USER;
+
+        log.info("saveUser role = {}", userRole);
+//        log.info("savedUser isReviewer = {}", requestDto.getReviewer());
+
         User user = User.builder()
                 .username(requestDto.getUsername())
                 .password(passwordEncoder.encode(requestDto.getPassword()))

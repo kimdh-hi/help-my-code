@@ -47,8 +47,8 @@ public class ReviewRequestService {
                 .title(requestDto.getTitle())
                 .code(requestDto.getCode())
                 .comment(requestDto.getComment())
-                .questionUser(user)
                 .language(requestDto.getLanguage())
+                .questionUser(user)
                 .answerUser(reviewer)
                 .status(QuestionStatus.REQUESTED)
                 .build();
@@ -81,7 +81,7 @@ public class ReviewRequestService {
 
         return ReviewListResponseDto.builder()
                 .reviews(reviewResponseDtoList)
-                .pageResponseDto(pageDto).build();
+                .pageInfo(pageDto).build();
     }
 
     @Transactional

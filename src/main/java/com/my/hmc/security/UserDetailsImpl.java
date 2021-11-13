@@ -3,13 +3,16 @@ package com.my.hmc.security;
 import com.my.hmc.domain.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 
+@Slf4j
 @Getter
 @RequiredArgsConstructor
 public class UserDetailsImpl implements UserDetails {
@@ -23,7 +26,8 @@ public class UserDetailsImpl implements UserDetails {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(authority);
 
-       return authorities;
+        log.info(authority.getAuthority().toString());
+        return authorities;
     }
 
     @Override

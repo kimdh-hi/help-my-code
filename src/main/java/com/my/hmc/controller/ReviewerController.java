@@ -32,8 +32,9 @@ public class ReviewerController {
             @RequestParam int page, @RequestParam int size,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
+        --page;
         User user = userDetails.getUser();
-        return reviewerService.getRequestedReviewList(user, size, page);
+        return reviewerService.getRequestedReviewList(user, page, size);
     }
 
     @Secured("ROLE_REVIEWER")

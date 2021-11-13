@@ -30,6 +30,7 @@ public class ReviewerService {
 
     @Transactional(readOnly = true)
     public RequestedReviewListResponseDto getRequestedReviewList(User user, int page, int size) {
+        log.info("리뷰목록 page = {}, size = {}", page, size);
         Pageable pageable = PageRequest.of(page, size);
         Page<ReviewQuestion> requestedReviews = reviewQuestionRepository.findByAnswerUser(user, pageable);
 
@@ -38,8 +39,8 @@ public class ReviewerService {
         ).collect(Collectors.toList());
 
         return RequestedReviewListResponseDto.builder()
-                .reviewResponseDtoList(collect)
-                .pageResponseDto(
+                .reviews(collect)
+                .pageInfo(
                         new PageResponseDto(requestedReviews.getTotalPages(), requestedReviews.getTotalElements(), requestedReviews.getNumberOfElements(), page, size)
                 ).build();
     }

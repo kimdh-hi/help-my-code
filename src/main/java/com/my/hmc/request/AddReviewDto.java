@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AddReviewDto {
 
-    private Long reviewId;
+    private Long reviewerId;
     private String title;
     private String code;
     private String comment;

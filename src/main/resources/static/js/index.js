@@ -35,86 +35,8 @@ $(document).ready(function() {
         console.log(userId)
         $('#requestCodeReviewBtn').show()
 
-        let data = {
-
-        }
-
-        $.ajax({
-            type: "POST",
-            url: "/reivew",
-            contentType: "application/json;charset=utf-8;",
-            data: data,
-            success: function(res) {
-                console.log(res)
-            }
-        })
     })
 })
-
-// 로그인
-function signin() {
-    console.log('로그인')
-    let username = $('#signin-id').val()
-    let password = $('#signin-password').val()
-
-    let data = {
-        "username": username,
-        "password": password
-    }
-
-    $.ajax({
-        type: "POST",
-        url: "/user/signin",
-        contentType: "application/json;charset=utf-8;",
-        data: JSON.stringify(data),
-        success: function(res) {
-            console.log(res)
-            sessionStorage.setItem("mytoken", res['token'])
-            alert('로그인에 성공했습니다.')
-            window.location.reload()
-        }
-    })
-}
-
-// 회원가입
-function signup() {
-    let id = $('#signup-id').val()
-    let password = $('#signup-password').val()
-    let isReviewer = $('input[id="signup-isReviewer"]').is(":checked")
-    let data = {}
-    let langs = []
-    if (isReviewer) {
-        $('input:checkbox[name="languageSelectBox"]').each(function() {
-            if (this.checked) {
-                langs.push($(this).val())
-            }
-        });
-    }
-
-    data = {
-        "username": id,
-        "password": password,
-        "isReviewer": isReviewer,
-        "languages": langs
-    }
-
-    $.ajax({
-        type: "POST",
-        url: "/user/signup",
-        contentType: "application/json;charset=utf-8;",
-        data: JSON.stringify(data),
-        success: function (res) {
-            console.log(res)
-            alert('회원가입에 성공했습니다.')
-            window.location.reload()
-        }
-    })
-}
-
-function logout() {
-    sessionStorage.clear();
-    window.location.reload();
-}
 
 function loginCheck() {
     // 인증이 된 경우
@@ -141,6 +63,15 @@ function showCodeReviewRequestForm() {
 
     if (display == "none") {
         $('#codeReviewRequestForm').css({"display": "block"})
+        $('#codeReviewRequestLanguageSelectBox').empty()
+        let tmp_html = `<option selected>언어 선택</option>
+                <option value="Java">Java</option>
+                <option value="Python">Python</option>
+                <option value="Javascript">Javascript</option>
+                <option value="C++">C++</option>
+                <option value="HTML">HTML</option>
+                <option value="CSS">C++</option>`
+        $('#codeReviewRequestLanguageSelectBox').append(tmp_html)
     } else {
         $('#codeReviewRequestForm').css({"display": "none"})
     }
@@ -150,22 +81,100 @@ function requestCodeReview() {
     let title = $('#codeReviewTitle').val()
     let code = $('#codeReviewCode').val()
     let comment = $('#codeReviewComment').val()
+    let language = $('#codeReviewRequestLanguageSelectBox').val()
+    let reviewerId = $('#codeReviewRequestReviewerSelectBox').val()
+
+    data = {
+        "reviewerId": reviewerId,
+        "title": title,
+        "code": code,
+        "comment": comment,
+        "language": language
+    }
 
     $.ajax({
         type: "POST",
         url: "/review",
         contentType: "application/json;charset=utf-8",
+        data: JSON.stringify(data),
+        success: function(res){
+            if (res['result'] == "success") {
+                alert(res['message'])
+                window.location.reload();
+            }
 
+        }
     })
 }
 
-function openSigninModal() {
-    $('#signinModal').modal('show');
+page = 1
+size = 10
+function showCodeReviewRequestList() {
+    let display = $('#codeReviewRequestListDiv').css("display")
+    if (display == "flex") {
+        $('#codeReviewRequestListDiv').css({"display": "none"})
+        return;
+    }
+    $('#codeReviewRequestListDiv').empty();
+    $('#codeReviewRequestListDiv').show();
+    $.ajax({
+        type: "GET",
+        url: `/reviews?page=${page}&size=${size}`,
+        success: function(res) {
+            let reviews = res['reviews']
+            for (let i=0; i<reviews.length; i++) {
+
+                let tmp_html = `<div class="card-header">${reviews[i].language}</div>
+                                <div class="card-body">
+                                    <h5 class="card-title">${reviews[i].title}</h5>
+                                    <p class="card-text">${reviews[i].comment}</p>
+                                    <a href="#" class="btn btn-primary">상세코드</a>
+                                </div>`
+                $('#codeReviewRequestListDiv').append(tmp_html);
+            }
+        }
+    })
 }
 
-function openSignupModal() {
-    $('#signupModal').modal('show');
+function showRequestedReviewList() {
+    let display = $('#codeReviewRequestListDiv').css("display")
+    if (display == "flex") {
+        $('#codeReviewRequestListDiv').css({"display": "none"})
+        return;
+    }
+    $('#codeReviewRequestListDiv').empty();
+    $('#codeReviewRequestListDiv').show();
+
+    $.ajax({
+        type: "GET",
+        url: `/reviewer/review?page=1&size=10`,
+        success: function (res) {
+            let reviews = res['reviews'];
+            for (let i=0; i<reviews.length; i++) {
+                let tmp_html = `<div class="card-header">${reviews[i].language}</div>
+                                <div class="card-body">
+                                    <h5 class="card-title">${reviews[i].title}</h5>
+                                    <p class="card-text">${reviews[i].comment}</p>
+                                    <a href="#" class="btn btn-primary">상세코드</a>
+                                </div>`
+                $('#codeReviewRequestListDiv').append(tmp_html);
+            }
+        }
+    })
 }
+
+function openDetailModal(id) {
+
+    $.ajax({
+        type: "GET",
+        url: `/review/reviewId=${id}`,
+        success: function(res) {
+            console.log(res);
+        }
+    })
+}
+
+
 
 // ajax 요청시 token이 있다면 헤더에 추가하도록 설정
 $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
@@ -173,3 +182,10 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
         jqXHR.setRequestHeader('Authorization', 'Bearer ' + sessionStorage.getItem('mytoken'));
     }
 });
+
+function clearCodeRequestForm() {
+    $('#codeReviewTitle').val('')
+    $('#codeReviewCode').val('')
+    $('#codeReviewComment').val(''
+    )
+}

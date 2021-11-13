@@ -59,6 +59,7 @@ public class ReviewRequestController {
             @RequestParam int page,
             @RequestParam int size
     ) {
+        --page;
         return reviewRequestService.getAllReviews(page, size);
     }
 

@@ -2,6 +2,7 @@ package com.my.hmc.controller;
 
 import com.my.hmc.request.SigninRequestDto;
 import com.my.hmc.request.SignupRequestDto;
+import com.my.hmc.response.BasicResponseDto;
 import com.my.hmc.response.ReviewResponseDto;
 import com.my.hmc.response.SigninResponseDto;
 import com.my.hmc.security.UserDetailsImpl;
@@ -17,6 +18,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
@@ -94,5 +96,13 @@ public class UserController {
         }
 
         return responseDto;
+    }
+
+    @Secured({"ROLE_USER", "ROLE_REVIEWER"})
+    @PostMapping("/user/logout")
+    public BasicResponseDto logout() {
+        SecurityContextHolder.clearContext();
+
+        return new BasicResponseDto(null, "success", "로그아웃 완료", HttpStatus.OK);
     }
 }

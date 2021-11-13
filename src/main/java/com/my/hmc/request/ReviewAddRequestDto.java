@@ -13,6 +13,6 @@ public class ReviewAddRequestDto {
     private String title;
     private String code;
     private String comment;
-    private String language;
     private Long reviewerId;
+    private String language;
 }

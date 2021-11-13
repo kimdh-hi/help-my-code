@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 public class ReviewListResponseDto {
 
-    List<ReviewResponseDto> reviews = new ArrayList<>();
+    private List<ReviewResponseDto> reviews = new ArrayList<>();
 
-    private PageResponseDto pageResponseDto;
+    private PageResponseDto pageInfo;
 }

@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 public class RequestedReviewListResponseDto {
 
-    private List<RequestedReviewResponseDto> reviewResponseDtoList;
+    private List<RequestedReviewResponseDto> reviews;
 
-    private PageResponseDto pageResponseDto;
+    private PageResponseDto pageInfo;
 }
