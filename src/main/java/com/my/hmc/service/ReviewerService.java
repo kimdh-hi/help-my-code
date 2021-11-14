@@ -35,7 +35,7 @@ public class ReviewerService {
         Page<ReviewQuestion> requestedReviews = reviewQuestionRepository.findByAnswerUser(user, pageable);
 
         List<RequestedReviewResponseDto> collect = requestedReviews.stream().map(
-                r -> new RequestedReviewResponseDto(r.getTitle(), r.getCode(), r.getComment(), r.getLanguage())
+                r -> new RequestedReviewResponseDto(r.getId(), r.getTitle(), r.getCode(), r.getComment(), r.getLanguage(), r.getStatus().toString())
         ).collect(Collectors.toList());
 
         return RequestedReviewListResponseDto.builder()
@@ -53,6 +53,7 @@ public class ReviewerService {
                 .code(review.getCode())
                 .comment(review.getComment())
                 .language(review.getLanguage())
+                .status(review.getStatus().toString())
                 .build();
     }
 

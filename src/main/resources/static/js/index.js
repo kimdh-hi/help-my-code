@@ -80,9 +80,9 @@ function showCodeReviewRequestForm() {
 }
 
 function requestCodeReview() {
-    let title = $('#codeReviewTitle').val()
-    let code = $('#codeReviewCode').val()
-    let comment = $('#codeReviewComment').val()
+    let title = $('#codeReviewRequestTitle').val()
+    let code = $('#codeReviewRequestCode').val()
+    let comment = $('#codeReviewRequestComment').val()
     let language = $('#codeReviewRequestLanguageSelectBox').val()
     let reviewerId = $('#codeReviewRequestReviewerSelectBox').val()
 
@@ -130,7 +130,7 @@ function showCodeReviewRequestList() {
                                 <div class="card-body">
                                     <h5 class="card-title">${reviews[i].title}</h5>
                                     <p class="card-text">${reviews[i].comment}</p>
-                                    <a href="#" class="btn btn-primary">상세코드</a>
+                                    <a onclick="showReviewDetailModal('${reviews[i].id}', false)" class="btn btn-primary">상세코드</a>
                                 </div>`
                 $('#codeReviewRequestListDiv').append(tmp_html);
             }
@@ -138,6 +138,7 @@ function showCodeReviewRequestList() {
     })
 }
 
+// 나에게 요청된 코드리뷰목록 보기
 function showRequestedReviewList() {
     let display = $('#codeReviewRequestListDiv').css("display")
     if (display == "flex") {
@@ -151,13 +152,17 @@ function showRequestedReviewList() {
         type: "GET",
         url: `/reviewer/review?page=1&size=10`,
         success: function (res) {
+            console.log(res)
+
             let reviews = res['reviews'];
             for (let i=0; i<reviews.length; i++) {
-                let tmp_html = `<div class="card-header">${reviews[i].language}</div>
+                let statusBadge = getStatusBadge(reviews[i]=.status)
+                console.log(statusBadge)
+                let tmp_html = `<div class="card-header">${reviews[i].language} ${statusBadge}</div>
                                 <div class="card-body">
                                     <h5 class="card-title">${reviews[i].title}</h5>
                                     <p class="card-text">${reviews[i].comment}</p>
-                                    <a href="#" class="btn btn-primary">상세코드</a>
+                                    <a onclick="showReviewDetailModal('${reviews[i].id}', true)" class="btn btn-primary">상세코드</a>
                                 </div>`
                 $('#codeReviewRequestListDiv').append(tmp_html);
             }
@@ -165,17 +170,7 @@ function showRequestedReviewList() {
     })
 }
 
-function openDetailModal(id) {
-
-    $.ajax({
-        type: "GET",
-        url: `/review/reviewId=${id}`,
-        success: function(res) {
-            console.log(res);
-        }
-    })
-}
-
+// 내가 요청한 코드리뷰목록 보기
 function showMyReviewRequestList() {
     let display = $('#codeReviewRequestListDiv').css("display")
     if (display == "flex") {
@@ -189,14 +184,13 @@ function showMyReviewRequestList() {
         type: "GET",
         url: `/user/reviews?page=1&size=10`,
         success: function (res) {
-            console.log(res)
             let reviews = res['reviews'];
             for (let i=0; i<reviews.length; i++) {
                 let tmp_html = `<div class="card-header">${reviews[i].language}</div>
                                 <div class="card-body">
                                     <h5 class="card-title">${reviews[i].title}</h5>
                                     <p class="card-text">${reviews[i].comment}</p>
-                                    <a href="#" class="btn btn-primary">상세코드</a>
+                                    <a onclick="showReviewDetailModal('${reviews[i].id}', false)" class="btn btn-primary">상세코드</a>
                                 </div>
                                 <div class="card-footer">
                                     <button onclick="" type="button" class="btn btn-warning">수정</button>
@@ -207,6 +201,7 @@ function showMyReviewRequestList() {
         }
     })
 }
+
 
 function deleteRequest(id) {
     $.ajax({
@@ -224,7 +219,104 @@ function editRequest(id) {
 
 }
 
+function showReviewDetailModal(id, isReviewer) {
+    $('#reviewDetailBody').empty()
+    $('#modalReviewTitle').html('')
+    let title;
+    let code;
+    let comment;
 
+    $.ajax({
+        type: "GET",
+        url: `/review?id=${id}`,
+        success: function(res) {
+
+            title = res.title;
+            code = res.code;
+            comment = res.comment;
+
+            if (isReviewer) {
+                console.log('showDetail: ' + title);
+                console.log('isReviewer: '+isReviewer)
+                $('#reviewDetailFooter').empty()
+                let tmp_btn = `<button class="btn btn-info" onclick="showReviewForm('${id}', '${title}', '${code}', '${comment}')">리뷰하기</button>`
+                $('#reviewDetailFooter').append(tmp_btn)
+                $('#reviewDetailFooter').append(
+                    `<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>`
+                )
+            }
+
+
+            $('#modalReviewTitle').html(title)
+            let tmp_html = `<div class="mb-3" id="reviewCode">
+                                ${code}
+                            </div>
+                            <div class="mb-3" id="reviewComment">
+                                ${comment}
+                            </div>`
+
+            $('#reviewDetailBody').append(tmp_html)
+        }
+    })
+
+    $('#codeReviewDetailModal').modal('show')
+}
+
+function showReviewForm(id, title, code, comment) {
+    $('#requestedReviewModalHeader').empty();
+    $('#requestedReviewModalBody').empty();
+    $('#requestedReviewModalComment').empty();
+
+    $('#requestedReviewModalHeader').html(title);
+    $('#requestedReviewModalBody').html(code)
+    $('#requestedReviewModalComment').html(comment)
+
+    let tmp_btn = `<button type="button" class="btn btn-secondary" onclick="addReview('${id}')">완료</button`
+    $('#reviewModalFooter').append(tmp_btn)
+
+
+    $('#codeReviewDetailModal').modal('hide')
+    $('#codeReviewModal').modal('show')
+}
+
+function addReview(id) {
+    let title = $('#codeReviewTitle').val()
+    let code = $('#codeReviewCode').val()
+    let comment = $('#codeReviewComment').val()
+
+    let data = {
+        "title": title,
+        "code": code,
+        "comment": comment
+    }
+
+    $.ajax({
+        type: "POST",
+        url: `/reviewer/review?id=${id}`,
+        contentType: "application/json;charset=utf-8",
+        data: JSON.stringify(data),
+        success: function(res) {
+            console.log(res)
+            if (res['result'] == "success") {
+                alert(res['message'])
+                window.location.reload()
+            }
+        }
+    })
+}
+
+function getStatusBadge(status) {
+    let statusBadge;
+    if (status == "REQUESTED") {
+        statusBadge = `<span class="badge bg-primary">요청됨</span>`
+    } else if (status =="DONE") {
+        statusBadge = `<span class="badge bg-success">완료됨</span>`
+    } else if (status == "REJECT") {
+        statusBadge = `<span class="badge bg-secondary">거절됨</span>`
+    }
+
+    return statusBadge;
+}
 
 // ajax 요청시 token이 있다면 헤더에 추가하도록 설정
 $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
@@ -234,8 +326,7 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
 });
 
 function clearCodeRequestForm() {
-    $('#codeReviewTitle').val('')
-    $('#codeReviewCode').val('')
-    $('#codeReviewComment').val(''
-    )
+    $('#codeReviewRequestTitle').val('')
+    $('#codeReviewRequestCode').val('')
+    $('#codeReviewRequestComment').val('')
 }

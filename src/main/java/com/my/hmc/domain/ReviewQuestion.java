@@ -22,11 +22,13 @@ public class ReviewQuestion {
     @Column(nullable = false)
     private String title;
 
+    @Lob
     @Column(nullable = false)
     private String code;
 
     private String comment;
 
+    @Column(nullable = false)
     private String language;
 
     @Enumerated(EnumType.STRING)

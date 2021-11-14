@@ -36,7 +36,7 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Transactional
-    public Long saveUser(SignupRequestDto requestDto) {
+    public User saveUser(SignupRequestDto requestDto) {
 //        UserRole userRole = requestDto.isReviewer() ? UserRole.ROLE_REVIEWER : UserRole.ROLE_USER;
         UserRole userRole = requestDto.isReviewer() ? UserRole.ROLE_REVIEWER : UserRole.ROLE_USER;
 
@@ -63,7 +63,7 @@ public class UserService {
         }
 
 
-        return savedUser.getId();
+        return savedUser;
     }
 
     public List<String> getMyLanguage(Long userId) {

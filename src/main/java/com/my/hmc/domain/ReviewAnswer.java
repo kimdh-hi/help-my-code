@@ -20,6 +20,7 @@ public class ReviewAnswer {
     @Column(nullable = false)
     private String title;
 
+    @Lob
     @Column(nullable = false)
     private String code;
 

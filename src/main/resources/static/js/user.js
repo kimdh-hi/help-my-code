@@ -43,7 +43,6 @@ function signup() {
     data = {
         "username": id,
         "password": password,
-//        "isReviewer": isReviewer,
         reviewer: isReviewer,
         "languages": langs
     }
@@ -72,6 +71,7 @@ function logout() {
         success: function(res) {
             if (res['result'] == "success") {
                 sessionStorage.clear();
+                alert(res['message'])
             }
         }
     })
