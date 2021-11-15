@@ -59,24 +59,10 @@ public class ReviewRequestController {
     public ReviewListResponseDto getAllReviews(
             @RequestParam int page,
             @RequestParam int size,
-            @RequestParam(required = false) QuestionStatus status
-    ) {
-        --page;
-        return reviewRequestService.getAllReviews(page, size, status);
-    }
-
-//    @GetMapping("/reviews/status")
-    public ReviewListResponseDto getAllReviewsByStatus(
-            @RequestParam int page, @RequestParam int size,
             @RequestParam QuestionStatus status
     ) {
         --page;
-//        QuestionStatus questionStatus = null;
-//        if (status.equals("REQUESTED")) questionStatus = QuestionStatus.REQUESTED;
-//        else if (status.equals("DONE")) questionStatus = QuestionStatus.DONE;
-//        else if (status.equals("REJECT")) questionStatus = QuestionStatus.REJECT;
-
-        return reviewRequestService.getAllReviewsByStatus(page, size, status);
+        return reviewRequestService.getAllReviews(page, size, status);
     }
 
     @Secured({"ROLE_USER", "ROLE_REVIEWER"})

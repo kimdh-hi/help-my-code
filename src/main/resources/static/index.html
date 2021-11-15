@@ -24,6 +24,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script src="./js/user.js"></script>
     <script src="./js/index.js"></script>
+    <script src="js/index.js"></script>
 </head>
 
 <script>
@@ -105,18 +106,47 @@
 
     <div>
 
-        <select id="statusSelectBox" class="form-select" aria-label="Default select example">
-            <option selected>처리상태</option>
-            <option value="ALL">전체보기</option>
-            <option value="REQUESTED">요청됨</option>
-            <option value="REJECT">거절됨</option>
-            <option value="DONE">완료됨</option>
-        </select>
+        <!-- 코드리뷰 전체목록 리스트-->
+        <div id="reviewRequestListDivBox" style="display: none">
+            <select id="reviewRequestStatusSelectBox" class="form-select" aria-label="Default select example">
+                <option selected>처리상태</option>
+                <option name="ALL" value="ALL">전체보기</option>
+                <option name="REQUESTED" value="REQUESTED">요청됨</option>
+                <option name="REJECT" value="REJECT">거절됨</option>
+                <option name="DONE" value="DONE">완료됨</option>
+            </select>
+            <div id="reviewRequestListDiv" class="card" style="display: none">
 
-        <!-- 코드리뷰 목록 리스트-->
-        <div id="codeReviewRequestListDiv" class="card" style="display: none">
-
+            </div>
         </div>
+
+        <!-- 내가 요청한 코드리뷰 리스트-->
+        <div id="myReviewRequestListDivBox" style="display: none">
+            <select id="myReviewRequestStatusSelectBox" class="form-select" aria-label="Default select example">
+                <option value="ALL" SELECTED>전체보기</option>
+                <option value="REQUESTED">요청됨</option>
+                <option value="REJECT">거절됨</option>
+                <option value="DONE">완료됨</option>
+            </select>
+            <div id="myReviewRequestListDiv" class="card" style="display: none">
+
+            </div>
+        </div>
+
+        <!-- 나에게 요청된 코드리뷰 리스트-->
+        <div id="reviewRequestedListDivBox" style="display: none">
+            <select id="reviewRequestedStatusSelectBox" class="form-select" aria-label="Default select example">
+                <option value="ALL" SELECTED>전체보기</option>
+                <option value="REQUESTED">요청됨</option>
+                <option value="REJECT">거절됨</option>
+                <option value="DONE">완료됨</option>
+            </select>
+            <div id="reviewRequestedListDiv" class="card" style="display: none">
+
+            </div>
+        </div>
+
+
     </div>
 </div>
 

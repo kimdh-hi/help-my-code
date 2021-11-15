@@ -36,39 +36,81 @@ $(document).ready(function() {
 
     })
 
-    $('#statusSelectBox').on("change", function() {
+    // 코드리뷰 요청 전체목록 처리상태 필터링 이벤트
+    $('#reviewRequestStatusSelectBox').off().on("change", function() {
         let status = $(this).val()
-
-        if (status == "ALL" || status == null) {
-
-        }
-
+        $('#reviewRequestListDiv').empty()
         $.ajax({
             type: "GET",
             url: `/reviews?page=1&size=10&status=${status}`,
             success: function(res) {
                 console.log(res)
-                let display = $('#codeReviewRequestListDiv').css("display")
-                if (display == "flex") {
-                    $('#codeReviewRequestListDiv').css({"display": "none"})
-                    return;
-                }
-                $('#codeReviewRequestListDiv').empty();
-                $('#codeReviewRequestListDiv').show();
+                $('#reviewRequestListDiv').show();
 
                 let reviews = res['reviews']
-                for (let i=0; i<reviews.length; i++) {
-                    let statusBadge = getStatusBadge(reviews[i].status)
-                    let tmp_html = `<div class="card-header">${reviews[i].language}</div>
-                                <div class="card-body">
-                                    <h5 class="card-title">${reviews[i].title}</h5>
-                                    <p class="card-text">${reviews[i].comment}</p>
-                                    <a onclick="showReviewDetailModal('${reviews[i].id}', false)" class="btn btn-primary">상세코드</a>
-                                </div>`
-                    $('#codeReviewRequestListDiv').append(tmp_html);
+                if (reviews.length > 0) {
+                    for (let i = 0; i < reviews.length; i++) {
+                        let tmp_html = makeReviewRequestCard(reviews[i])
+                        $('#reviewRequestListDiv').append(tmp_html);
+                    }
+                } else {
+                    let tmp_html = `<p>조회된 결과가 없습니다.</p>`
+                    $('#reviewRequestListDiv').append(tmp_html);
                 }
             }
         })
+        $('#reviewRequestListDivBox').show();
+    })
+
+    // 내가 요청한 코드리뷰 전체목록 처리상태 필터링 이벤트
+    $('#myReviewRequestStatusSelectBox').off().on("change", function() {
+        let status = $(this).val()
+        $('#myReviewRequestListDiv').empty()
+        $.ajax({
+            type: "GET",
+            url: `/user/reviews?page=1&size=10&status=${status}`,
+            success: function(res) {
+                console.log(res)
+                $('#myReviewRequestListDiv').show();
+
+                let reviews = res['reviews']
+                if (reviews.length > 0) {
+                    for (let i = 0; i < reviews.length; i++) {
+                        let tmp_html = makeReviewRequestCard(reviews[i])
+                        $('#myReviewRequestListDiv').append(tmp_html);
+                    }
+                } else {
+                    let tmp_html = `<p>조회된 결과가 없습니다.</p>`
+                    $('#myReviewRequestListDiv').append(tmp_html);
+                }
+            }
+        })
+        $('#myReviewRequestListDivBox').show();
+    })
+
+    // 내에게 요청된 코드리뷰 전체목록 처리상태 필터링 이벤트
+    $('#reviewRequestedStatusSelectBox').off().on("change", function() {
+        let status = $(this).val()
+        $('#reviewRequestedListDiv').empty()
+        $.ajax({
+            type: "GET",
+            url: `/reviewer/reviews?page=1&size=10&status=${status}`,
+            success: function(res) {
+                $('#reviewRequestedListDiv').show();
+
+                let reviews = res['reviews']
+                if (reviews.length > 0) {
+                    for (let i = 0; i < reviews.length; i++) {
+                        let tmp_html = makeReviewRequestCard(reviews[i])
+                        $('#reviewRequestedListDiv').append(tmp_html);
+                    }
+                } else {
+                    let tmp_html = `<p>조회된 결과가 없습니다.</p>`
+                    $('#reviewRequestedListDiv').append(tmp_html);
+                }
+            }
+        })
+        $('#reviewRequestedListDivBox').show();
     })
 })
 
@@ -94,7 +136,6 @@ function loginCheck() {
 }
 
 function showCodeReviewRequestForm() {
-    console.log("코드리뷰요청 폼 열기")
     let display = $('#codeReviewRequestForm').css("display")
 
     if (display == "none") {
@@ -143,97 +184,108 @@ function requestCodeReview() {
     })
 }
 
-page = 1
-size = 10
+// =================
+// 모든 코드리뷰요청 목록
+// =================
 function showCodeReviewRequestList() {
-    let display = $('#codeReviewRequestListDiv').css("display")
-    if (display == "flex") {
-        $('#codeReviewRequestListDiv').css({"display": "none"})
+    let display = $('#reviewRequestListDivBox').css("display")
+    if (display == "block") {
+        $('#reviewRequestListDivBox').hide()
         return;
     }
-    $('#codeReviewRequestListDiv').empty();
-    $('#codeReviewRequestListDiv').show();
+
+    hideOtherReviewListBox('reviewRequestListDivBox')
+
+    $('#reviewRequestListDivBox').show()
+    $('#reviewRequestListDiv').empty();
+
     $.ajax({
         type: "GET",
-        url: `/reviews?page=${page}&size=${size}`,
+        url: `/reviews?page=1&size=10&status=ALL`,
         success: function(res) {
             let reviews = res['reviews']
-            for (let i=0; i<reviews.length; i++) {
-                let statusBadge = getStatusBadge(reviews[i].status)
-                let tmp_html = `<div class="card-header">${reviews[i].language} ${statusBadge}</div>
-                                <div class="card-body">
-                                    <h5 class="card-title">${reviews[i].title}</h5>
-                                    <p class="card-text">${reviews[i].comment}</p>
-                                    <a onclick="showReviewDetailModal('${reviews[i].id}', false)" class="btn btn-primary">상세코드</a>
-                                </div>`
-                $('#codeReviewRequestListDiv').append(tmp_html);
+            if (reviews.length > 0) {
+                for (let i = 0; i < reviews.length; i++) {
+                    let tmp_html = makeReviewRequestCard(reviews[i], false)
+                    $('#reviewRequestListDiv').append(tmp_html);
+                }
+            } else {
+                let tmp_html = `<p>조회된 결과가 없습니다.</p>`
+                $('#reviewRequestListDiv').append(tmp_html);
             }
         }
     })
+
+    $('#reviewRequestListDiv').show();
+
 }
 
+// =================
 // 나에게 요청된 코드리뷰목록 보기
+// =================
 function showRequestedReviewList() {
-    let display = $('#codeReviewRequestListDiv').css("display")
-    if (display == "flex") {
-        $('#codeReviewRequestListDiv').css({"display": "none"})
+    let display = $('#reviewRequestedListDivBox').css("display")
+    if (display == "block") {
+        $('#reviewRequestedListDivBox').hide()
         return;
     }
-    $('#codeReviewRequestListDiv').empty();
-    $('#codeReviewRequestListDiv').show();
+
+    hideOtherReviewListBox('reviewRequestedListDivBox')
+
+    $('#reviewRequestedListDivBox').show()
+    $('#reviewRequestedListDiv').empty();
 
     $.ajax({
         type: "GET",
-        url: `/reviewer/review?page=1&size=10`,
-        success: function (res) {
-            console.log(res)
-
-            let reviews = res['reviews'];
-            for (let i=0; i<reviews.length; i++) {
-                let statusBadge = getStatusBadge(reviews[i].status)
-                let tmp_html = `<div class="card-header">${reviews[i].language} ${statusBadge}</div>
-                                <div class="card-body">
-                                    <h5 class="card-title">${reviews[i].title}</h5>
-                                    <p class="card-text">${reviews[i].comment}</p>
-                                    <a onclick="showReviewDetailModal('${reviews[i].id}', true)" class="btn btn-primary">상세코드</a>
-                                </div>`
-                $('#codeReviewRequestListDiv').append(tmp_html);
+        url: `/reviewer/reviews?page=1&size=10&status=ALL`,
+        success: function(res) {
+            let reviews = res['reviews']
+            if (reviews.length > 0) {
+                for (let i = 0; i < reviews.length; i++) {
+                    let tmp_html = makeReviewRequestCard(reviews[i], true)
+                    $('#reviewRequestedListDiv').append(tmp_html);
+                }
+            } else {
+                let tmp_html = `<p>조회된 결과가 없습니다.</p>`
+                $('#reviewRequestedListDiv').append(tmp_html);
             }
         }
     })
+    $('#reviewRequestedListDiv').show();
 }
 
+// =================
 // 내가 요청한 코드리뷰목록 보기
+// =================
 function showMyReviewRequestList() {
-    let display = $('#codeReviewRequestListDiv').css("display")
-    if (display == "flex") {
-        $('#codeReviewRequestListDiv').css({"display": "none"})
+    let display = $('#myReviewRequestListDivBox').css("display")
+    if (display == "block") {
+        $('#myReviewRequestListDivBox').hide()
         return;
     }
-    $('#codeReviewRequestListDiv').empty();
-    $('#codeReviewRequestListDiv').show();
+
+    hideOtherReviewListBox('myReviewRequestListDivBox')
+
+    $('#myReviewRequestListDivBox').show()
+    $('#myReviewRequestListDiv').empty();
 
     $.ajax({
         type: "GET",
-        url: `/user/reviews?page=1&size=10`,
-        success: function (res) {
-            let reviews = res['reviews'];
-            for (let i=0; i<reviews.length; i++) {
-                let statusBadge = getStatusBadge(reviews[i].status)
-                let tmp_html = `<div class="card-header">${reviews[i].language}</div>
-                                <div class="card-body">
-                                    <h5 class="card-title">${reviews[i].title}</h5>
-                                    <p class="card-text">${reviews[i].comment}</p>
-                                    <a onclick="showReviewDetailModal('${reviews[i].id}', false)" class="btn btn-primary">상세코드</a>
-                                </div>
-                                <div class="card-footer">
-                                    <button onclick="" type="button" class="btn btn-warning">수정</button>
-                                    <button onclick="deleteRequest('${reviews[i].id}')" type="button" class="btn btn-danger">삭제</button>
-                                </div>`
-                $('#codeReviewRequestListDiv').append(tmp_html);
+        url: `/reviews?page=1&size=10&status=ALL`,
+        success: function(res) {
+            let reviews = res['reviews']
+            if (reviews.length > 0) {
+                for (let i = 0; i < reviews.length; i++) {
+                    let tmp_html = makeMyReviewRequestCard(reviews[i])
+                    $('#myReviewRequestListDiv').append(tmp_html);
+                }
+            } else {
+                let tmp_html = `<p>조회된 결과가 없습니다.</p>`
+                $('#myReviewRequestListDiv').append(tmp_html);
             }
         }
     })
+    $('#myReviewRequestListDiv').show();
 }
 
 
@@ -253,7 +305,9 @@ function editRequest(id) {
 
 }
 
+// =================
 // 코드리뷰요청 상세정보
+// =================
 function showReviewDetailModal(id, isReviewer) {
     $('#reviewDetailBody').empty()
     $('#modalReviewTitle').html('')
@@ -297,7 +351,9 @@ function showReviewDetailModal(id, isReviewer) {
     $('#codeReviewDetailModal').modal('show')
 }
 
+// =================
 // 코드리뷰 폼 모달
+// =================
 function showReviewForm(id, title, code, comment) {
     $('#requestedReviewModalHeader').empty();
     $('#requestedReviewModalBody').empty();
@@ -355,6 +411,52 @@ function rejectReview(id) {
     })
 }
 
+
+
+// ajax 요청시 token이 있다면 헤더에 추가하도록 설정
+$.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
+    if (sessionStorage.getItem('mytoken') != null) {
+        jqXHR.setRequestHeader('Authorization', 'Bearer ' + sessionStorage.getItem('mytoken'));
+    }
+});
+
+//===============================================//
+//===============================================//
+//===============================================//
+
+function makeMyReviewRequestCard(review) {
+    let statusBadge = getStatusBadge(review.status)
+    let tmp_html = `<div class="card-header">${review.language}</div>
+                                <div class="card-body">
+                                    <h5 class="card-title">${review.title} ${statusBadge}</h5>
+                                    <p class="card-text">${review.comment}</p>
+                                    <a onclick="showReviewDetailModal('${review.id}', false)" class="btn btn-primary">상세코드</a>
+                                </div>
+                                <div class="card-footer">
+                                    <button onclick="" type="button" class="btn btn-warning">수정</button>
+                                    <button onclick="deleteRequest('${review.id}')" type="button" class="btn btn-danger">삭제</button>
+                                </div>`
+    return tmp_html
+}
+
+function makeReviewRequestCard(review, isReviewer) {
+    let statusBadge = getStatusBadge(review.status)
+    let tmp_card = `<div class="card-header">${review.language} ${statusBadge}</div>
+                            <div class="card-body">
+                                <h5 class="card-title">${review.title}</h5>
+                                <p class="card-text">${review.comment}</p>
+                                <a onclick="showReviewDetailModal('${review.id}', ${isReviewer})" class="btn btn-primary">상세코드</a>
+                            </div>`
+    return tmp_card;
+
+}
+
+function clearCodeRequestForm() {
+    $('#codeReviewRequestTitle').val('')
+    $('#codeReviewRequestCode').val('')
+    $('#codeReviewRequestComment').val('')
+}
+
 function getStatusBadge(status) {
     let statusBadge;
     if (status == "REQUESTED") {
@@ -368,15 +470,15 @@ function getStatusBadge(status) {
     return statusBadge;
 }
 
-// ajax 요청시 token이 있다면 헤더에 추가하도록 설정
-$.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
-    if (sessionStorage.getItem('mytoken') != null) {
-        jqXHR.setRequestHeader('Authorization', 'Bearer ' + sessionStorage.getItem('mytoken'));
+function hideOtherReviewListBox(boxId) {
+    if (boxId == "reviewRequestListDivBox") {
+        $('#myReviewRequestListDivBox').hide()
+        $('#reviewRequestedListDivBox').hide()
+    } else if (boxId == "myReviewRequestListDivBox") {
+        $('#reviewRequestedListDivBox').hide()
+        $('#reviewRequestListDivBox').hide()
+    } else if (boxId == "reviewRequestedListDivBox") {
+        $('#reviewRequestListDivBox').hide()
+        $('#myReviewRequestListDivBox').hide()
     }
-});
-
-function clearCodeRequestForm() {
-    $('#codeReviewRequestTitle').val('')
-    $('#codeReviewRequestCode').val('')
-    $('#codeReviewRequestComment').val('')
 }

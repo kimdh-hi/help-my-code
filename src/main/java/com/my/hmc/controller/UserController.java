@@ -1,5 +1,6 @@
 package com.my.hmc.controller;
 
+import com.my.hmc.domain.etype.QuestionStatus;
 import com.my.hmc.request.SigninRequestDto;
 import com.my.hmc.request.SignupRequestDto;
 import com.my.hmc.response.BasicResponseDto;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -58,7 +60,8 @@ public class UserController {
         UserDetails userDetails = userDetailsService.loadUserByUsername(requestDto.getUsername());
         String token = jwtUtils.createToken(userDetails.getUsername());
 
-        return new SigninResponseDto(token, HttpStatus.CREATED, "로그인에 성공했습니다.");
+        String authority = userDetails.getAuthorities().stream().findFirst().get().toString();
+        return new SigninResponseDto(token, authority, HttpStatus.CREATED, "로그인에 성공했습니다.");
     }
 
     @Secured("ROLE_REVIEWER")
@@ -81,10 +84,11 @@ public class UserController {
     @GetMapping("/user/reviews")
     public ReviewListResponseDto getMyReviewRequests(
             @RequestParam int page, @RequestParam int size,
+            @RequestParam QuestionStatus status,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         --page;
-        return userService.getMyReviewRequests(page, size, userDetails.getUser());
+        return userService.getMyReviewRequests(page, size, status, userDetails.getUser());
     }
 
     @Secured({"ROLE_USER", "ROLE_REVIEWER"})

@@ -3,12 +3,11 @@ package com.my.hmc.service;
 import com.my.hmc.domain.ReviewAnswer;
 import com.my.hmc.domain.ReviewQuestion;
 import com.my.hmc.domain.User;
+import com.my.hmc.domain.etype.QuestionStatus;
 import com.my.hmc.repository.ReviewAnswerRepository;
 import com.my.hmc.repository.ReviewQuestionRepository;
 import com.my.hmc.request.AddReviewDto;
-import com.my.hmc.response.PageResponseDto;
-import com.my.hmc.response.RequestedReviewListResponseDto;
-import com.my.hmc.response.RequestedReviewResponseDto;
+import com.my.hmc.response.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -29,9 +28,13 @@ public class ReviewerService {
     private final ReviewQuestionRepository reviewQuestionRepository;
 
     @Transactional(readOnly = true)
-    public RequestedReviewListResponseDto getRequestedReviewList(User user, int page, int size) {
-        log.info("리뷰목록 page = {}, size = {}", page, size);
+    public RequestedReviewListResponseDto getRequestedReviewList(User user, int page, int size, QuestionStatus status) {
         Pageable pageable = PageRequest.of(page, size);
+
+        if (!status.toString().equals("ALL")) {
+            return getAllReviewsByUserAndStatus(user, status, pageable);
+        }
+
         Page<ReviewQuestion> requestedReviews = reviewQuestionRepository.findByAnswerUser(user, pageable);
 
         List<RequestedReviewResponseDto> collect = requestedReviews.stream().map(
@@ -43,6 +46,30 @@ public class ReviewerService {
                 .pageInfo(
                         new PageResponseDto(requestedReviews.getTotalPages(), requestedReviews.getTotalElements(), requestedReviews.getNumberOfElements(), page, size)
                 ).build();
+    }
+
+    @Transactional(readOnly = true)
+    public RequestedReviewListResponseDto getAllReviewsByUserAndStatus(
+            User questionUser, QuestionStatus status, Pageable pageable) {
+
+        Page<ReviewQuestion> reviewQuestions
+                = reviewQuestionRepository.findByAnswerUserAndStatus(questionUser, status, pageable);
+
+        List<RequestedReviewResponseDto> reviewResponseDtoList = reviewQuestions.stream().map(
+                r -> new RequestedReviewResponseDto(r.getId(), r.getTitle(), r.getCode(), r.getComment(), r.getLanguage(), r.getStatus().toString())
+        ).collect(Collectors.toList());
+
+        PageResponseDto pageDto = PageResponseDto.builder()
+                .page(reviewQuestions.getNumber())
+                .size(reviewQuestions.getSize())
+                .totalPages(reviewQuestions.getTotalPages())
+                .totalElements(reviewQuestions.getTotalElements())
+                .numberOfElements(reviewQuestions.getNumberOfElements()).build();
+
+        return RequestedReviewListResponseDto.builder()
+                .reviews(reviewResponseDtoList)
+                .pageInfo(pageDto)
+                .build();
     }
 
     @Transactional(readOnly = true)

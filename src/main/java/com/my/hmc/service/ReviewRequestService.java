@@ -66,7 +66,7 @@ public class ReviewRequestService {
     @Transactional(readOnly = true)
     public ReviewListResponseDto getAllReviews(int page, int size, QuestionStatus status) {
 
-        if (status != null) {
+        if (!status.toString().equals("ALL")) {
             return getAllReviewsByStatus(page, size, status);
         }
 

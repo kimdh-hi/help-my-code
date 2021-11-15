@@ -1,6 +1,7 @@
 package com.my.hmc.controller;
 
 import com.my.hmc.domain.User;
+import com.my.hmc.domain.etype.QuestionStatus;
 import com.my.hmc.request.AddReviewDto;
 import com.my.hmc.response.BasicResponseDto;
 import com.my.hmc.response.RequestedReviewListResponseDto;
@@ -27,19 +28,22 @@ public class ReviewerController {
     private final ReviewerService reviewerService;
 
     @Secured("ROLE_REVIEWER")
-    @GetMapping("/reviewer/review")
+    @GetMapping("/reviewer/reviews")
     public RequestedReviewListResponseDto getRequestedReviewList(
             @RequestParam int page, @RequestParam int size,
+            @RequestParam QuestionStatus status,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         --page;
         User user = userDetails.getUser();
-        return reviewerService.getRequestedReviewList(user, page, size);
+        return reviewerService.getRequestedReviewList(user, page, size, status);
     }
 
     @Secured("ROLE_REVIEWER")
-    @GetMapping("/reviewer/reviews")
-    public RequestedReviewResponseDto getRequestedReview(@RequestParam Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    @GetMapping("/reviewer/review")
+    public RequestedReviewResponseDto getRequestedReview(
+            @RequestParam Long id,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
         return reviewerService.getRequestedReview(user, id);
     }

@@ -15,8 +15,8 @@ function signin() {
         contentType: "application/json;charset=utf-8;",
         data: JSON.stringify(data),
         success: function(res) {
-            console.log(res)
             sessionStorage.setItem("mytoken", res['token'])
+            sessionStorage.setItem("myAuthority", res['authority'])
             alert('로그인에 성공했습니다.')
             window.location.reload()
         }, error: function(err) {
@@ -43,11 +43,10 @@ function signup() {
     data = {
         "username": id,
         "password": password,
-        reviewer: isReviewer,
+        "reviewer": isReviewer,
         "languages": langs
     }
 
-    console.log(data)
 
     $.ajax({
         type: "POST",
@@ -55,7 +54,6 @@ function signup() {
         contentType: "application/json;charset=utf-8;",
         data: JSON.stringify(data),
         success: function (res) {
-            console.log(res)
             alert('회원가입에 성공했습니다.')
             window.location.reload()
         }, error: function(err) {
