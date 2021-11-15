@@ -253,6 +253,7 @@ function editRequest(id) {
 
 }
 
+// 코드리뷰요청 상세정보
 function showReviewDetailModal(id, isReviewer) {
     $('#reviewDetailBody').empty()
     $('#modalReviewTitle').html('')
@@ -296,6 +297,7 @@ function showReviewDetailModal(id, isReviewer) {
     $('#codeReviewDetailModal').modal('show')
 }
 
+// 코드리뷰 폼 모달
 function showReviewForm(id, title, code, comment) {
     $('#requestedReviewModalHeader').empty();
     $('#requestedReviewModalBody').empty();
@@ -305,9 +307,10 @@ function showReviewForm(id, title, code, comment) {
     $('#requestedReviewModalBody').html(code)
     $('#requestedReviewModalComment').html(comment)
 
-    let tmp_btn = `<button type="button" class="btn btn-secondary" onclick="addReview('${id}')">완료</button`
-    $('#reviewModalFooter').append(tmp_btn)
-
+    let addBtn = `<button type="button" class="btn btn-primary" onclick="addReview('${id}')">완료</button`
+    let rejectBtn = `<button type="button" class="btn btn-warn" onclick="rejectReview('${id}')">거절</button`
+    $('#reviewModalFooter').append(addBtn)
+    $('#reviewModalFooter').append(rejectBtn)
 
     $('#codeReviewDetailModal').modal('hide')
     $('#codeReviewModal').modal('show')
@@ -335,6 +338,19 @@ function addReview(id) {
                 alert(res['message'])
                 window.location.reload()
             }
+        }
+    })
+}
+
+function rejectReview(id) {
+
+    $.ajax({
+        type: "PUT",
+        url: `/reviewer/review/reject?id=${id}`,
+        success: function(res) {
+            console.log(res);
+            alert(res.message)
+            window.location.reload();
         }
     })
 }

@@ -66,4 +66,12 @@ public class ReviewerController {
     ) {
 
     }
+
+    @Secured("ROLE_REVIEWER")
+    @PutMapping("/reviewer/review/reject")
+    public BasicResponseDto rejectReviewRequest(@RequestParam Long id) {
+        reviewerService.rejectReviewRequest(id);
+
+        return new BasicResponseDto(id, "success", "요청된 코드리뷰를 거절했습니다.", HttpStatus.OK);
+    }
 }

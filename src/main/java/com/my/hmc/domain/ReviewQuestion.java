@@ -57,4 +57,8 @@ public class ReviewQuestion {
         this.reviewAnswer = reviewAnswer;
         this.status = QuestionStatus.DONE;
     }
+
+    public void reject() {
+        this.status = QuestionStatus.REJECT;
+    }
 }

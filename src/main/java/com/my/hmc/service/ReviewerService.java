@@ -78,4 +78,13 @@ public class ReviewerService {
     public void editReviewAndComment(User user, Long reviewId, AddReviewDto addReviewDto) {
 
     }
+
+    @Transactional
+    public void rejectReviewRequest(Long id) {
+        ReviewQuestion reviewQuestion = reviewQuestionRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 리뷰요청입니다.")
+        );
+
+        reviewQuestion.reject();
+    }
 }
