@@ -156,7 +156,7 @@ function showRequestedReviewList() {
 
             let reviews = res['reviews'];
             for (let i=0; i<reviews.length; i++) {
-                let statusBadge = getStatusBadge(reviews[i]=.status)
+                let statusBadge = getStatusBadge(reviews[i].status)
                 console.log(statusBadge)
                 let tmp_html = `<div class="card-header">${reviews[i].language} ${statusBadge}</div>
                                 <div class="card-body">
