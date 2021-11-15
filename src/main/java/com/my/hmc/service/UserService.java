@@ -77,7 +77,7 @@ public class UserService {
         Page<ReviewQuestion> reviewQuestions = reviewQuestionRepository.findByQuestionUser(user, pageable);
 
         List<ReviewResponseDto> reviewResponseDtoList = reviewQuestions.stream().map(
-                r -> new ReviewResponseDto(r.getId(), r.getTitle(), r.getCode(), r.getComment(), r.getLanguage())
+                r -> new ReviewResponseDto(r.getId(), r.getTitle(), r.getCode(), r.getComment(), r.getLanguage(), r.getStatus())
         ).collect(Collectors.toList());
 
         PageResponseDto pageDto = PageResponseDto.builder()
@@ -98,7 +98,7 @@ public class UserService {
         );
 
         return new ReviewResponseDto(
-                reviewQuestion.getId(), reviewQuestion.getTitle(), reviewQuestion.getCode(), reviewQuestion.getComment(), reviewQuestion.getLanguage()
+                reviewQuestion.getId(), reviewQuestion.getTitle(), reviewQuestion.getCode(), reviewQuestion.getComment(), reviewQuestion.getLanguage(), reviewQuestion.getStatus()
         );
     }
 

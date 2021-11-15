@@ -1,6 +1,7 @@
 package com.my.hmc.controller;
 
 import com.my.hmc.domain.ReviewQuestion;
+import com.my.hmc.domain.etype.QuestionStatus;
 import com.my.hmc.request.ReviewAddRequestDto;
 import com.my.hmc.request.ReviewUpdateRequestDto;
 import com.my.hmc.response.BasicResponseDto;
@@ -57,10 +58,25 @@ public class ReviewRequestController {
     @GetMapping("/reviews")
     public ReviewListResponseDto getAllReviews(
             @RequestParam int page,
-            @RequestParam int size
+            @RequestParam int size,
+            @RequestParam(required = false) QuestionStatus status
     ) {
         --page;
-        return reviewRequestService.getAllReviews(page, size);
+        return reviewRequestService.getAllReviews(page, size, status);
+    }
+
+//    @GetMapping("/reviews/status")
+    public ReviewListResponseDto getAllReviewsByStatus(
+            @RequestParam int page, @RequestParam int size,
+            @RequestParam QuestionStatus status
+    ) {
+        --page;
+//        QuestionStatus questionStatus = null;
+//        if (status.equals("REQUESTED")) questionStatus = QuestionStatus.REQUESTED;
+//        else if (status.equals("DONE")) questionStatus = QuestionStatus.DONE;
+//        else if (status.equals("REJECT")) questionStatus = QuestionStatus.REJECT;
+
+        return reviewRequestService.getAllReviewsByStatus(page, size, status);
     }
 
     @Secured({"ROLE_USER", "ROLE_REVIEWER"})

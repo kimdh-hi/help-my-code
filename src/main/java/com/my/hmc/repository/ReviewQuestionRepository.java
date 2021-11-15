@@ -2,6 +2,7 @@ package com.my.hmc.repository;
 
 import com.my.hmc.domain.ReviewQuestion;
 import com.my.hmc.domain.User;
+import com.my.hmc.domain.etype.QuestionStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,6 +22,8 @@ public interface ReviewQuestionRepository extends JpaRepository<ReviewQuestion, 
     Page<ReviewQuestion> findByAnswerUser(User answerUser, Pageable pageable);
 
     ReviewQuestion findByIdAndAnswerUser(Long id, User answerUser);
+
+    Page<ReviewQuestion> findByStatus(QuestionStatus status, Pageable pageable);
 
     void deleteById(Long id);
 

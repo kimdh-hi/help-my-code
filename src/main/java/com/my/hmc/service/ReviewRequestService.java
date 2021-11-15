@@ -64,12 +64,38 @@ public class ReviewRequestService {
     }
 
     @Transactional(readOnly = true)
-    public ReviewListResponseDto getAllReviews(int page, int size) {
+    public ReviewListResponseDto getAllReviews(int page, int size, QuestionStatus status) {
+
+        if (status != null) {
+            return getAllReviewsByStatus(page, size, status);
+        }
+
         Pageable pageable = PageRequest.of(page, size);
         Page<ReviewQuestion> reviewQuestions = reviewQuestionRepository.findAll(pageable);
 
         List<ReviewResponseDto> reviewResponseDtoList = reviewQuestions.stream().map(
-                r -> new ReviewResponseDto(r.getId(), r.getTitle(), r.getCode(), r.getComment(), r.getLanguage())
+                r -> new ReviewResponseDto(r.getId(), r.getTitle(), r.getCode(), r.getComment(), r.getLanguage(), r.getStatus())
+        ).collect(Collectors.toList());
+
+        PageResponseDto pageDto = PageResponseDto.builder()
+                .page(page)
+                .size(size)
+                .totalPages(reviewQuestions.getTotalPages())
+                .totalElements(reviewQuestions.getTotalElements())
+                .numberOfElements(reviewQuestions.getNumberOfElements()).build();
+
+        return ReviewListResponseDto.builder()
+                .reviews(reviewResponseDtoList)
+                .pageInfo(pageDto).build();
+    }
+
+    @Transactional(readOnly = true)
+    public ReviewListResponseDto getAllReviewsByStatus(int page, int size, QuestionStatus status) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ReviewQuestion> reviewQuestions = reviewQuestionRepository.findByStatus(status, pageable);
+
+        List<ReviewResponseDto> reviewResponseDtoList = reviewQuestions.stream().map(
+                r -> new ReviewResponseDto(r.getId(), r.getTitle(), r.getCode(), r.getComment(), r.getLanguage(), r.getStatus())
         ).collect(Collectors.toList());
 
         PageResponseDto pageDto = PageResponseDto.builder()

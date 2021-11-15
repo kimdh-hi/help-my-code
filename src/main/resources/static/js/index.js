@@ -32,9 +32,43 @@ $(document).ready(function() {
 
     $("#codeReviewRequestReviewerSelectBox").on("change", function() {
         let userId = $(this).val()
-        console.log(userId)
         $('#requestCodeReviewBtn').show()
 
+    })
+
+    $('#statusSelectBox').on("change", function() {
+        let status = $(this).val()
+
+        if (status == "ALL" || status == null) {
+
+        }
+
+        $.ajax({
+            type: "GET",
+            url: `/reviews?page=1&size=10&status=${status}`,
+            success: function(res) {
+                console.log(res)
+                let display = $('#codeReviewRequestListDiv').css("display")
+                if (display == "flex") {
+                    $('#codeReviewRequestListDiv').css({"display": "none"})
+                    return;
+                }
+                $('#codeReviewRequestListDiv').empty();
+                $('#codeReviewRequestListDiv').show();
+
+                let reviews = res['reviews']
+                for (let i=0; i<reviews.length; i++) {
+                    let statusBadge = getStatusBadge(reviews[i].status)
+                    let tmp_html = `<div class="card-header">${reviews[i].language}</div>
+                                <div class="card-body">
+                                    <h5 class="card-title">${reviews[i].title}</h5>
+                                    <p class="card-text">${reviews[i].comment}</p>
+                                    <a onclick="showReviewDetailModal('${reviews[i].id}', false)" class="btn btn-primary">상세코드</a>
+                                </div>`
+                    $('#codeReviewRequestListDiv').append(tmp_html);
+                }
+            }
+        })
     })
 })
 
@@ -125,8 +159,8 @@ function showCodeReviewRequestList() {
         success: function(res) {
             let reviews = res['reviews']
             for (let i=0; i<reviews.length; i++) {
-
-                let tmp_html = `<div class="card-header">${reviews[i].language}</div>
+                let statusBadge = getStatusBadge(reviews[i].status)
+                let tmp_html = `<div class="card-header">${reviews[i].language} ${statusBadge}</div>
                                 <div class="card-body">
                                     <h5 class="card-title">${reviews[i].title}</h5>
                                     <p class="card-text">${reviews[i].comment}</p>
@@ -156,8 +190,7 @@ function showRequestedReviewList() {
 
             let reviews = res['reviews'];
             for (let i=0; i<reviews.length; i++) {
-                let statusBadge = getStatusBadge(reviews[i]=.status)
-                console.log(statusBadge)
+                let statusBadge = getStatusBadge(reviews[i].status)
                 let tmp_html = `<div class="card-header">${reviews[i].language} ${statusBadge}</div>
                                 <div class="card-body">
                                     <h5 class="card-title">${reviews[i].title}</h5>
@@ -186,6 +219,7 @@ function showMyReviewRequestList() {
         success: function (res) {
             let reviews = res['reviews'];
             for (let i=0; i<reviews.length; i++) {
+                let statusBadge = getStatusBadge(reviews[i].status)
                 let tmp_html = `<div class="card-header">${reviews[i].language}</div>
                                 <div class="card-body">
                                     <h5 class="card-title">${reviews[i].title}</h5>
