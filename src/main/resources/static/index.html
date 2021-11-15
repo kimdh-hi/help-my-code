@@ -145,9 +145,8 @@
 
             </div>
         </div>
-
-
     </div>
+
 </div>
 
 <!--코드리뷰 모달-->
@@ -206,7 +205,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalReviewTitle"></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -219,7 +218,37 @@
                 </div>
             </div>
             <div class="modal-footer" id="reviewDetailFooter">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--코드리뷰 수정 모달-->
+<div class="modal fade" id="codeReviewUpdateModal" tabindex="-1" role="dialog" aria-labelledby="codeReviewUpdateModal"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="form-floating mb-3">
+                    <label for="codeReviewTitle">Title</label>
+                    <input type="text" class="form-control" id="codeReviewUpdateTitle" placeholder="제목을 입력하세요.">
+                </div>
+            </div>
+            <div class="modal-body" id="reviewModalUpdateBody" style="width: 500px; height: 500px">
+                <div class="form-floating mb-3">
+                    <label for="codeReviewUpdateCode">Code</label>
+                    <textarea class="form-control" placeholder="코드를 입력하세요." id="codeReviewUpdateCode"
+                              style="height: 300px"></textarea>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <label for="codeReviewUpdateComment">Comments</label>
+                    <textarea class="form-control" placeholder="설명을 입력하세요." id="codeReviewUpdateComment"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer" id="reviewUpdateFooter">
+
             </div>
         </div>
     </div>
@@ -308,7 +337,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modal-title">로그인</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -323,7 +352,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" onclick="signin()">로그인</button>
             </div>
         </div>

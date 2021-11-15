@@ -18,6 +18,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -61,6 +62,7 @@ public class UserController {
         String token = jwtUtils.createToken(userDetails.getUsername());
 
         String authority = userDetails.getAuthorities().stream().findFirst().get().toString();
+
         return new SigninResponseDto(token, authority, HttpStatus.CREATED, "로그인에 성공했습니다.");
     }
 
