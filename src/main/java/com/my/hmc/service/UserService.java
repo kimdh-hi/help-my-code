@@ -3,6 +3,7 @@ package com.my.hmc.service;
 import com.my.hmc.domain.Language;
 import com.my.hmc.domain.ReviewQuestion;
 import com.my.hmc.domain.User;
+import com.my.hmc.domain.etype.QuestionStatus;
 import com.my.hmc.domain.etype.UserRole;
 import com.my.hmc.repository.LanguageRepository;
 import com.my.hmc.repository.ReviewQuestionRepository;
@@ -37,11 +38,9 @@ public class UserService {
 
     @Transactional
     public User saveUser(SignupRequestDto requestDto) {
-//        UserRole userRole = requestDto.isReviewer() ? UserRole.ROLE_REVIEWER : UserRole.ROLE_USER;
         UserRole userRole = requestDto.isReviewer() ? UserRole.ROLE_REVIEWER : UserRole.ROLE_USER;
 
         log.info("saveUser role = {}", userRole);
-//        log.info("savedUser isReviewer = {}", requestDto.getReviewer());
 
         User user = User.builder()
                 .username(requestDto.getUsername())
@@ -70,14 +69,17 @@ public class UserService {
         return languageRepository.findByUserId(userId);
     }
 
-    public ReviewListResponseDto getMyReviewRequests(int page, int size, User user) {
-
+    public ReviewListResponseDto getMyReviewRequests(int page, int size, QuestionStatus status, User user) {
         Pageable pageable = PageRequest.of(page, size);
+
+        if (!status.toString().equals("ALL")) {
+            return getAllReviewsByUserAndStatus(user, status, pageable);
+        }
 
         Page<ReviewQuestion> reviewQuestions = reviewQuestionRepository.findByQuestionUser(user, pageable);
 
         List<ReviewResponseDto> reviewResponseDtoList = reviewQuestions.stream().map(
-                r -> new ReviewResponseDto(r.getId(), r.getTitle(), r.getCode(), r.getComment(), r.getLanguage())
+                r -> new ReviewResponseDto(r.getId(), r.getTitle(), r.getCode(), r.getComment(), r.getLanguage(), r.getStatus())
         ).collect(Collectors.toList());
 
         PageResponseDto pageDto = PageResponseDto.builder()
@@ -98,8 +100,30 @@ public class UserService {
         );
 
         return new ReviewResponseDto(
-                reviewQuestion.getId(), reviewQuestion.getTitle(), reviewQuestion.getCode(), reviewQuestion.getComment(), reviewQuestion.getLanguage()
+                reviewQuestion.getId(), reviewQuestion.getTitle(), reviewQuestion.getCode(), reviewQuestion.getComment(), reviewQuestion.getLanguage(), reviewQuestion.getStatus()
         );
     }
 
+    @Transactional(readOnly = true)
+    public ReviewListResponseDto getAllReviewsByUserAndStatus(
+            User questionUser, QuestionStatus status, Pageable pageable) {
+
+        Page<ReviewQuestion> reviewQuestions
+                = reviewQuestionRepository.findByQuestionUserAndStatus(questionUser, status, pageable);
+
+        List<ReviewResponseDto> reviewResponseDtoList = reviewQuestions.stream().map(
+                r -> new ReviewResponseDto(r.getId(), r.getTitle(), r.getCode(), r.getComment(), r.getLanguage(), r.getStatus())
+        ).collect(Collectors.toList());
+
+        PageResponseDto pageDto = PageResponseDto.builder()
+                .page(reviewQuestions.getNumber())
+                .size(reviewQuestions.getSize())
+                .totalPages(reviewQuestions.getTotalPages())
+                .totalElements(reviewQuestions.getTotalElements())
+                .numberOfElements(reviewQuestions.getNumberOfElements()).build();
+
+        return ReviewListResponseDto.builder()
+                .reviews(reviewResponseDtoList)
+                .pageInfo(pageDto).build();
+    }
 }
