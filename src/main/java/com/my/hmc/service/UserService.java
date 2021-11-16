@@ -8,15 +8,24 @@ import com.my.hmc.domain.etype.UserRole;
 import com.my.hmc.repository.LanguageRepository;
 import com.my.hmc.repository.ReviewQuestionRepository;
 import com.my.hmc.repository.UserRepository;
+import com.my.hmc.request.SigninRequestDto;
 import com.my.hmc.request.SignupRequestDto;
 import com.my.hmc.response.PageResponseDto;
 import com.my.hmc.response.ReviewListResponseDto;
 import com.my.hmc.response.ReviewResponseDto;
+import com.my.hmc.response.SigninResponseDto;
+import com.my.hmc.security.UserDetailsServiceImpl;
+import com.my.hmc.security.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +40,9 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
+    private final UserDetailsServiceImpl userDetailsService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
     private final UserRepository userRepository;
     private final ReviewQuestionRepository reviewQuestionRepository;
     private final LanguageRepository languageRepository;
@@ -63,6 +75,23 @@ public class UserService {
 
 
         return savedUser;
+    }
+
+    public SigninResponseDto signin(SigninRequestDto requestDto) {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(requestDto.getUsername(), requestDto.getPassword())
+            );
+        } catch (BadCredentialsException e) {
+            throw new BadCredentialsException("로그인에 실패했습니다.");
+        }
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(requestDto.getUsername());
+        String token = jwtUtils.createToken(userDetails.getUsername());
+
+        String authority = userDetails.getAuthorities().stream().findFirst().get().toString();
+
+        return new SigninResponseDto(token, authority, HttpStatus.CREATED, "로그인에 성공했습니다.");
     }
 
     public List<String> getMyLanguage(Long userId) {

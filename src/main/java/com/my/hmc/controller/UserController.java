@@ -14,6 +14,7 @@ import com.my.hmc.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -36,34 +37,21 @@ import java.util.stream.Collectors;
 @RestController
 public class UserController {
 
-    private final JwtUtils jwtUtils;
-    private final UserDetailsServiceImpl userDetailsService;
     private final UserService userService;
-    private final AuthenticationManager authenticationManager;
 
     @PostMapping("/user/signup")
-    public void signup(@RequestBody SignupRequestDto requestDto) {
+    public ResponseEntity<BasicResponseDto> signup(@RequestBody SignupRequestDto requestDto) {
         userService.saveUser(requestDto);
+        BasicResponseDto responseDto = BasicResponseDto.builder()
+                .result("success").httpStatus(HttpStatus.CREATED).message("회원가입에 성공했습니다.").build();
+
+        return ResponseEntity.ok(responseDto);
     }
 
     @PostMapping("/user/signin")
     public SigninResponseDto signin(@RequestBody SigninRequestDto requestDto) {
-        log.info("로그은: {}", requestDto.getUsername());
-        log.info("비밀번호: {}", requestDto.getPassword());
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(requestDto.getUsername(), requestDto.getPassword())
-            );
-        } catch (BadCredentialsException e) {
-            throw new BadCredentialsException("로그인에 실패했습니다.");
-        }
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(requestDto.getUsername());
-        String token = jwtUtils.createToken(userDetails.getUsername());
-
-        String authority = userDetails.getAuthorities().stream().findFirst().get().toString();
-
-        return new SigninResponseDto(token, authority, HttpStatus.CREATED, "로그인에 성공했습니다.");
+        return userService.signin(requestDto);
     }
 
     @Secured("ROLE_REVIEWER")
@@ -72,10 +60,6 @@ public class UserController {
         List<String> data = new ArrayList<>();
         if (userDetails != null) {
             Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-
-            for (GrantedAuthority authority : authorities) {
-                log.info("language 권한: {}", authority.getAuthority());
-            }
 
             data =  userService.getMyLanguage(userDetails.getUser().getId());
         }

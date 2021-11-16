@@ -39,12 +39,12 @@ public class TestDataInit implements ApplicationRunner {
         User reviewer2 = createReviewer("PythonGod", "1234", "Python");
 
         createReview("요청제목1", "리뷰코드1", "도와주세요ㅠ", "Java", testUser1, reviewer1);
-        createReview("요청제목2", "리뷰코드2", "도와주세요ㅠ", "Java", testUser1, reviewer2);
-        createReview("요청제목3", "리뷰코드3", "도와주세요ㅠ", "Java", testUser1, reviewer2);
-        createReview("요청제목4", "리뷰코드4", "도와주세요ㅠ", "Java", testUser1, reviewer2);
-        createReview("요청제목5", "리뷰코드5", "도와주세요ㅠ", "Java", testUser1, reviewer2);
-        createReview("요청제목6", "리뷰코드6", "도와주세요ㅠ", "Java", testUser1, reviewer2);
-        createReview("요청제목7", "리뷰코드7", "도와주세요ㅠ", "Java", testUser1, reviewer2);
+        createReview("요청제목2", "리뷰코드2", "도와주세요ㅠ", "Java", testUser1, reviewer1);
+        createReview("요청제목3", "리뷰코드3", "도와주세요ㅠ", "Java", testUser1, reviewer1);
+        createReview("요청제목4", "리뷰코드4", "도와주세요ㅠ", "Java", testUser1, reviewer1);
+        createReview("요청제목5", "리뷰코드5", "도와주세요ㅠ", "Java", testUser1, reviewer1);
+        createReview("요청제목6", "리뷰코드6", "도와주세요ㅠ", "Java", testUser1, reviewer1);
+        createReview("요청제목7", "리뷰코드7", "도와주세요ㅠ", "Java", testUser1, reviewer1);
 
     }
 

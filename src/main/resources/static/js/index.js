@@ -44,7 +44,7 @@ $(document).ready(function () {
         $('#reviewRequestListDiv').empty()
         $.ajax({
             type: "GET",
-            url: `/reviews?page=1&size=10&status=${status}`,
+            url: `/reviews?page=1&size=5&status=${status}`,
             success: function (res) {
                 console.log(res)
                 $('#reviewRequestListDiv').show();
@@ -59,6 +59,7 @@ $(document).ready(function () {
                     let tmp_html = `<p>조회된 결과가 없습니다.</p>`
                     $('#reviewRequestListDiv').append(tmp_html);
                 }
+                makePagingButtonForRequest(res.pageInfo.page, res.pageInfo.totalPages);
             }
         })
         $('#reviewRequestListDivBox').show();
@@ -180,9 +181,9 @@ function requestCodeReview() {
 // ========================================
 // 모든 코드리뷰요청 목록
 // ========================================
-function showCodeReviewRequestList() {
+function showCodeReviewRequestList(page, isPageRequest) {
     let display = $('#reviewRequestListDivBox').css("display")
-    if (display == "block") {
+    if (display == "block" && !isPageRequest) {
         $('#reviewRequestListDivBox').hide()
         return;
     }
@@ -194,7 +195,7 @@ function showCodeReviewRequestList() {
 
     $.ajax({
         type: "GET",
-        url: `/reviews?page=1&size=10&status=ALL`,
+        url: `/reviews?page=${page}&size=5&status=ALL`,
         success: function (res) {
             let reviews = res['reviews']
             if (reviews.length > 0) {
@@ -206,6 +207,8 @@ function showCodeReviewRequestList() {
                 let tmp_html = `<p>조회된 결과가 없습니다.</p>`
                 $('#reviewRequestListDiv').append(tmp_html);
             }
+            console.log(res.pageInfo)
+            makePagingButtonForRequest(res.pageInfo.page, res.pageInfo.totalPages);
         }
     })
 
@@ -214,7 +217,7 @@ function showCodeReviewRequestList() {
 }
 
 // ========================================
-// 나에게 요청된 코드리뷰목록 보기
+// 나에게 요청된 코드리뷰 목록
 // ========================================
 function showRequestedReviewList() {
     let display = $('#reviewRequestedListDivBox').css("display")
@@ -248,7 +251,7 @@ function showRequestedReviewList() {
 }
 
 // ========================================
-// 내가 요청한 코드리뷰목록 보기
+// 내가 요청한 코드리뷰 목록
 // ========================================
 function showMyReviewRequestList() {
     let display = $('#myReviewRequestListDivBox').css("display")
@@ -469,6 +472,28 @@ $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
 //===============================================//
 //===============================================//
 //===============================================//
+
+function makePagingButtonForRequest(page, totalPage) {
+    $('#reviewRequestPageButtons').empty()
+
+    for (let i=1; i<=totalPage; i++) {
+        let pagingBtn = ``;
+        if (i-1 == page) {
+            pagingBtn = `<li class="page-item active"><a class="page-link" onclick="showCodeReviewRequestList('${i}', true)">${i}</a></li>`
+        }else {
+            pagingBtn = `<li class="page-item"><a class="page-link" onclick="showCodeReviewRequestList('${i}', true)">${i}</a></li>`
+        }
+        $('#reviewRequestPageButtons').append(pagingBtn)
+    }
+}
+
+function makePagingButtonForRequestedMe(page, totalPage) {
+
+}
+
+function makePagingButtonForMyRequest(page, totalPage) {
+
+}
 
 function makeMyReviewRequestCard(review) {
     let id = review.id;

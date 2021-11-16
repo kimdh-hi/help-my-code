@@ -50,7 +50,7 @@
                 onclick="showRequestedReviewList()">리뷰하기
         </button>
         <button type="button" class="btn btn-light index-btn" id="reviewRequestListBtn"
-                onclick="showCodeReviewRequestList()">코드리뷰목록
+                onclick="showCodeReviewRequestList(1, false)">코드리뷰목록
         </button>
         <button type="button" class="btn btn-light index-btn" id="myReviewRequestListBtn" style="display: none"
                 onclick="showMyReviewRequestList()">나의 요청목록
@@ -118,6 +118,12 @@
             <div id="reviewRequestListDiv" class="card" style="display: none">
 
             </div>
+
+            <nav aria-label="Page navigation example">
+                <ul class="pagination" id="reviewRequestPageButtons">
+
+                </ul>
+            </nav>
         </div>
 
         <!-- 내가 요청한 코드리뷰 리스트-->
@@ -131,6 +137,12 @@
             <div id="myReviewRequestListDiv" class="card" style="display: none">
 
             </div>
+
+            <nav aria-label="Page navigation example">
+                <ul class="pagination" id="myReviewRequestPageButtons">
+
+                </ul>
+            </nav>
         </div>
 
         <!-- 나에게 요청된 코드리뷰 리스트-->
@@ -144,6 +156,12 @@
             <div id="reviewRequestedListDiv" class="card" style="display: none">
 
             </div>
+
+            <nav aria-label="Page navigation example">
+                <ul class="pagination" id="reviewRequestedPageButtons">
+
+                </ul>
+            </nav>
         </div>
     </div>
 

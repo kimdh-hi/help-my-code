@@ -55,12 +55,16 @@ public class ReviewRequestController {
         return ResponseEntity.ok(responseDto);
     }
 
+    /**
+     * 모든 코드리뷰 요청
+     */
     @GetMapping("/reviews")
     public ReviewListResponseDto getAllReviews(
             @RequestParam int page,
             @RequestParam int size,
             @RequestParam QuestionStatus status
     ) {
+        log.info("page={}", page);
         --page;
         return reviewRequestService.getAllReviews(page, size, status);
     }
